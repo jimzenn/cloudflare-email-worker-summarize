@@ -52,8 +52,8 @@ export default {
     const email = await PostalMime.parse(message.raw);
     const chatId = 151667449;
 
-    await sendPushoverNotification(email.subject, email.text, env);
-    await sendTelegramMessage(chatId, email.text, env);
+    sendPushoverNotification(email.subject, email.text, env);
+    sendTelegramMessage(chatId, email.text, env);
   },
 };
 
