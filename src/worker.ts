@@ -62,10 +62,10 @@ export default {
   async email(message: ForwardableEmailMessage, env: Env, ctx: ExecutionContext): Promise<void> {
     const email = await PostalMime.parse(message.raw);
     const chatId = 151667449;
-    const text = removeUrls(removeRepeatedNewlines(email.text));
+    // const text = removeUrls(removeRepeatedNewlines(email.text));
 
-    const pushoverPromise = sendPushoverNotification(email.subject, text, env);
-    const telegramPromise = sendTelegramMessage(chatId, text, env);
+    const pushoverPromise = sendPushoverNotification(email.subject, email.text, env);
+    const telegramPromise = sendTelegramMessage(chatId, email.text, env);
 
     await Promise.all([pushoverPromise, telegramPromise]);
   },
