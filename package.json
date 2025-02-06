@@ -9,6 +9,8 @@
     "wrangler": "^3.107.3"
   },
   "dependencies": {
-    "postal-mime": "^2.4.3"
+    "@types/url-regex-safe": "^1.0.2",
+    "postal-mime": "^2.4.3",
+    "url-regex-safe": "^4.0.0"
   }
 }
