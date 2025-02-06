@@ -64,8 +64,10 @@ export default {
     const chatId = 151667449;
     const text = removeUrls(removeRepeatedNewlines(email.text));
 
-    sendPushoverNotification(email.subject, text, env);
-    sendTelegramMessage(chatId, text, env);
+    const pushoverPromise = sendPushoverNotification(email.subject, text, env);
+    const telegramPromise = sendTelegramMessage(chatId, text, env);
+
+    await Promise.all([pushoverPromise, telegramPromise]);
   },
 };
 
