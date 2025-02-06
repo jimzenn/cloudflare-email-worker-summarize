@@ -4,18 +4,12 @@ interface Env {
   PUSHOVER_API_URL: string;
 }
 
-interface EmailMessage {
-  from: string;
-  subject?: string;
-  text?: string;
-  html?: string;
-}
-
-async function sendPushoverNotification(email: EmailMessage, env: Env): Promise<void> {
-  const title = email.subject?.trim() || 'No Subject';
+async function sendPushoverNotification(email: ForwardableEmailMessage, env: Env): Promise<void> {
+  const title = email.headers.get('subject')?.trim() || 'No Subject';
   const content = [
     `From: ${email.from}`,
-    `Subject: ${email.subject || 'No Subject'}`,
+    `To: ${email.to}`,
+    `Subject: ${title}`,
   ].join('\n');
 
   const params = new URLSearchParams({
@@ -38,7 +32,7 @@ async function sendPushoverNotification(email: EmailMessage, env: Env): Promise<
 }
 
 export default {
-  async email(message: EmailMessage, env: Env, ctx): Promise<void> {
+  async email(message: ForwardableEmailMessage, env: Env, ctx: ExecutionContext): Promise<void> {
     console.log('Received email:', message);
     await sendPushoverNotification(message, env);
   },
