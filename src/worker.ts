@@ -47,13 +47,25 @@ async function sendTelegramMessage(
   }
 }
 
+function removeUrls(text: string): string {
+  // This regex matches URLs starting with http://, https://, or www.
+  const urlRegex = /(https?:\/\/[^\s]+)|(www\.[^\s]+)/g;
+  return text.replace(urlRegex, '');
+}
+
+function removeRepeatedNewlines(text: string): string {
+  // Replace 3 or more newlines with 2 newlines
+  return text.replace(/\n{3,}/g, '\n\n');
+}
+
 export default {
   async email(message: ForwardableEmailMessage, env: Env, ctx: ExecutionContext): Promise<void> {
     const email = await PostalMime.parse(message.raw);
     const chatId = 151667449;
+    const text = removeUrls(removeRepeatedNewlines(email.text));
 
-    sendPushoverNotification(email.subject, email.text, env);
-    sendTelegramMessage(chatId, email.text, env);
+    sendPushoverNotification(email.subject, text, env);
+    sendTelegramMessage(chatId, text, env);
   },
 };
 
