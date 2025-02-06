@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "build": "wrangler deploy --dry-run",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^3.107.3"
+  }
+}
