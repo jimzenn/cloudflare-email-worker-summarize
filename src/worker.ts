@@ -16,8 +16,6 @@ async function sendPushoverNotification(email: EmailMessage, env: Env): Promise<
   const content = [
     `From: ${email.from}`,
     `Subject: ${email.subject || 'No Subject'}`,
-    `Text: ${email.text || 'No Text'}`,
-    `HTML: ${email.html || 'No HTML'}`
   ].join('\n');
 
   const params = new URLSearchParams({
@@ -40,7 +38,7 @@ async function sendPushoverNotification(email: EmailMessage, env: Env): Promise<
 }
 
 export default {
-  async email(message: EmailMessage, env: Env, ctx: ExecutionContext): Promise<void> {
+  async email(message: EmailMessage, env: Env, ctx): Promise<void> {
     console.log('Received email:', message);
     await sendPushoverNotification(message, env);
   },
