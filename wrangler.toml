@@ -4,6 +4,8 @@ compatibility_date = "2025-02-05"
 
 [vars]
 PUSHOVER_API_URL = "https://api.pushover.net/1/messages.json"
+TELEGRAM_TO_CHAT_ID = "151667449"
+SHORTIO_DOMAIN = "link.zenn.in"
 
 [observability.logs]
 enabled = true
