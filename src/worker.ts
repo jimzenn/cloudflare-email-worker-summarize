@@ -173,8 +173,13 @@ function removeRepeatedEmptyLines(text: string): string {
   return text.replace(/(\n\s*){3,}/g, '\n\n');
 }
 
-async function replaceWithShortenedUrls(text: string, env: Env): Promise<string> {
+function matchAndCleanUrls(text: string): string[] {
   const urls = text.match(urlRegexSafe({ strict: true, localhost: false })) || [];
+  return urls.map(url => url.endsWith('>') ? url.slice(0, -1) : url);
+}
+
+async function replaceWithShortenedUrls(text: string, env: Env): Promise<string> {
+  const urls = matchAndCleanUrls(text);
   let processedText = text;
 
   for (const url of urls) {
