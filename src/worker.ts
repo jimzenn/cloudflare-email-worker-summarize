@@ -1,5 +1,4 @@
 import PostalMime from 'postal-mime';
-import urlRegexSafe from 'url-regex-safe';
 
 // ======================
 // Type Definitions
@@ -173,17 +172,30 @@ function removeRepeatedEmptyLines(text: string): string {
   return text.replace(/(\n\s*){3,}/g, '\n\n');
 }
 
-function matchAndCleanUrls(text: string): string[] {
-  const urls = text.match(urlRegexSafe({ strict: true, localhost: false })) || [];
-  return urls.map(url => url.endsWith('>') ? url.slice(0, -1) : url);
+function extractUrls(text: string): string[] {
+  // Custom regex that excludes <, >, [, and ] from all URL components
+  const urlRegex = /https?:\/\/(?:[^\s/?#<>\[\]]+\.)+[^\s/?#<>\[\]]+(?:\/[^\s?#<>\[\]]*)*(?:\?[^\s#<>\[\]]*)?(?:#[^\s<>\[\]]*)?/gi;
+
+  // Match URLs and filter out localhost
+  return (text.match(urlRegex) || []).filter(url => {
+    try {
+      const parsed = new URL(url);
+      return !parsed.hostname.includes('localhost');
+    } catch {
+      return false;
+    }
+  });
 }
 
+
 async function replaceWithShortenedUrls(text: string, env: Env): Promise<string> {
-  const urls = matchAndCleanUrls(text);
+  const urls = extractUrls(text);
   let processedText = text;
 
   for (const url of urls) {
     const shortUrl = await shortenUrl(url, env);
+    console.log(`Replacing ${url} with ${shortUrl}`);
+    processedText = processedText.split('<' + url + '>').join(shortUrl);
     processedText = processedText.split(url).join(shortUrl);
   }
 
