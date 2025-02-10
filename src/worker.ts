@@ -13,7 +13,15 @@ interface Env {
   TELEGRAM_TO_CHAT_ID: string;
   SHORTIO_API_KEY: string;
   SHORTIO_DOMAIN: string;
+  EMAIL_ALLOWLIST: string;
 }
+
+interface EmailValidationResult {
+  allowed: boolean;
+  normalizedSender: string;
+  originalSender: string;
+}
+
 
 interface ShortenResponse {
   shortURL?: string;
@@ -29,10 +37,43 @@ const TELEGRAM_API_BASE = 'https://api.telegram.org/bot';
 const MAX_TELEGRAM_MESSAGE_LENGTH = 4096;
 const SLUG_HASH_LENGTH = 4;
 const MIN_URL_LENGTH_FOR_SHORTENING = 50;
+const EMAIL_NORMALIZATION_REGEX = /(\+[^@]+)?@/;
+const ALLOWLIST_SEPARATOR = ',';
 
 // ======================
 // Utility Functions
 // ======================
+function normalizeEmail(email: string): string {
+  return email
+    .toLowerCase()
+    .replace(EMAIL_NORMALIZATION_REGEX, '@') // Remove + suffixes
+    .trim();
+}
+
+function compileAllowlistPatterns(allowlist: string): RegExp[] {
+  return allowlist.split(ALLOWLIST_SEPARATOR)
+    .filter(pattern => pattern.trim().length > 0)
+    .map(pattern => {
+      const escaped = pattern
+        .trim()
+        .toLowerCase()
+        .replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // Escape regex special chars
+        .replace(/\\\*/g, '.*'); // Convert wildcards to regex
+
+      return new RegExp(`^${escaped}$`);
+    });
+}
+
+function isEmailAllowed(sender: string, allowlistPatterns: RegExp[]): EmailValidationResult {
+  const normalized = normalizeEmail(sender);
+  const original = sender.toLowerCase().trim();
+
+  const allowed = allowlistPatterns.some(pattern =>
+    pattern.test(normalized) || pattern.test(original)
+  );
+
+  return { allowed, normalizedSender: normalized, originalSender: original };
+}
 
 const createHttpClient = (baseOptions: RequestInit = {}) => async <T>(
   url: string,
@@ -151,7 +192,23 @@ async function replaceWithShortenedUrls(text: string, env: Env): Promise<string>
 export default {
   async email(message: ForwardableEmailMessage, env: Env, ctx: ExecutionContext): Promise<void> {
     try {
+      // Parse email first to get sender information
       const email = await PostalMime.parse(message.raw);
+      const sender = email.from?.value?.[0]?.address || 'unknown';
+
+      // Configure allowlist patterns
+      const allowlistPatterns = compileAllowlistPatterns(
+        env.EMAIL_ALLOWLIST
+      );
+
+      // Validate sender against allowlist
+      const validation = isEmailAllowed(sender, allowlistPatterns);
+      if (!validation.allowed) {
+        console.log(`Blocked email from: ${validation.originalSender}, Subject: "${email.subject}"`);
+        return; // Exit without processing
+      }
+
+      // Proceed with processing
       const cleanText = removeRepeatedEmptyLines(email.text || '');
       const processedText = await replaceWithShortenedUrls(cleanText, env);
 
@@ -159,6 +216,7 @@ export default {
         sendPushoverNotification(email.subject, processedText, env),
         sendTelegramMessage(processedText, env),
       ]);
+
     } catch (error) {
       console.error('Email processing failed:', error);
       throw error;
