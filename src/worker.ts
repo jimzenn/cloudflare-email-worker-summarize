@@ -194,7 +194,7 @@ export default {
     try {
       // Parse email first to get sender information
       const email = await PostalMime.parse(message.raw);
-      const sender = email.from?.value?.[0]?.address || 'unknown';
+      const sender = email.from.address || 'unknown';
 
       // Configure allowlist patterns
       const allowlistPatterns = compileAllowlistPatterns(
