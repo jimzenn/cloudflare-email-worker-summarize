@@ -130,8 +130,8 @@ async function resolveUrlToFinal(url: string): Promise<string> {
 export async function replaceWithShortenedUrls(text: string, env: Env): Promise<string> {
   const urls = extractUrls(text);
 
-  // If there are too many URLs, replace them with <URL> instead
   if (urls.length > MAX_URL_SHORTENS) {
+    console.warn(`Too many URLs (${urls.length}) to shorten, skipping`);
     return urls.reduce((text, url) => text.split(url).join(URL_PLACEHOLDER), text);
   }
 

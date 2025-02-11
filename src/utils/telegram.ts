@@ -1,39 +1,78 @@
 import { Env } from '../types/env';
 import { markdownv2 as format } from 'telegram-format';
 
+// Constants
 const MAX_TELEGRAM_MESSAGE_LENGTH = 4096;
 const TELEGRAM_API_BASE = 'https://api.telegram.org/bot';
 
+// Types
+interface TelegramResponse {
+  ok: boolean;
+  description?: string;
+}
+
+// Utility functions
 function escapeMarkdownV2(text: string): string {
   const specialChars = /[>#+={}.!-]/g;
   return text.replace(specialChars, '\\$&');
 }
 
-export async function sendTelegramMessage(sender: string, subject: string, text: string, env: Env): Promise<void> {
-  const apiUrl = `${TELEGRAM_API_BASE}${env.TELEGRAM_BOT_TOKEN}/sendMessage`;
-  const escapedText = escapeMarkdownV2(text);
-  const shortenedText = escapedText.slice(0, MAX_TELEGRAM_MESSAGE_LENGTH);
-
-
-  const msg = [
+function formatMarkdownMessage(subject: string, sender: string, text: string): string {
+  return [
     format.blockquote([
       format.bold(escapeMarkdownV2(subject)),
       "from: " + format.monospace(sender),
     ].join('\n')),
-    shortenedText
+    text
   ].join('\n\n');
+}
 
-  console.log('Sending Telegram message:', msg);
+function formatPlainMessage(subject: string, sender: string, text: string): string {
+  return [
+    `${subject}`,
+    `from: ${sender}`,
+    '',
+    text
+  ].join('\n');
+}
 
-  const response = await fetch(apiUrl, {
+async function sendTelegramRequest(
+  apiUrl: string, 
+  chatId: string, 
+  text: string, 
+  parseMode?: 'MarkdownV2'
+): Promise<Response> {
+  return fetch(apiUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      chat_id: env.TELEGRAM_TO_CHAT_ID,
-      text: msg,
-      parse_mode: 'MarkdownV2'
+      chat_id: chatId,
+      text,
+      ...(parseMode && { parse_mode: parseMode })
     }),
   });
+}
+
+export async function sendTelegramMessage(
+  sender: string, 
+  subject: string, 
+  text: string, 
+  env: Env
+): Promise<void> {
+  const apiUrl = `${TELEGRAM_API_BASE}${env.TELEGRAM_BOT_TOKEN}/sendMessage`;
+  const escapedText = escapeMarkdownV2(text);
+  const shortenedText = escapedText.slice(0, MAX_TELEGRAM_MESSAGE_LENGTH);
+
+  // Try sending formatted message first
+  const formattedMsg = formatMarkdownMessage(subject, sender, shortenedText);
+  console.log('Sending Telegram message:', formattedMsg);
+  
+  const response = await sendTelegramRequest(
+    apiUrl, 
+    env.TELEGRAM_TO_CHAT_ID, 
+    formattedMsg, 
+    'MarkdownV2'
+  );
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => null);
@@ -42,22 +81,22 @@ export async function sendTelegramMessage(sender: string, subject: string, text:
       statusText: response.statusText,
       errorData,
     });
-    // retry without parse_mode
-    const retry_response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: env.TELEGRAM_TO_CHAT_ID,
-        text: msg,
-      }),
-    });
-    if (!retry_response.ok) {
-      const errorData = await retry_response.json().catch(() => null);
-      console.error('Telegram API error:', {
-        status: retry_response.status,
-        statusText: retry_response.statusText,
-        errorData,
+
+    const plainMsg = formatPlainMessage(subject, sender, shortenedText);
+    const retryResponse = await sendTelegramRequest(
+      apiUrl, 
+      env.TELEGRAM_TO_CHAT_ID, 
+      plainMsg
+    );
+
+    if (!retryResponse.ok) {
+      const retryErrorData = await retryResponse.json().catch(() => null);
+      console.error('Telegram API retry error:', {
+        status: retryResponse.status,
+        statusText: retryResponse.statusText,
+        errorData: retryErrorData,
       });
+      throw new Error('Failed to send Telegram message after retry');
     }
   }
 }
