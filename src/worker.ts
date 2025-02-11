@@ -3,7 +3,6 @@ import { replaceWithShortenedUrls } from './utils/link';
 import { sendPushoverNotification } from './utils/pushover';
 import { sendTelegramMessage } from './utils/telegram';
 import { Env } from './types/env';
-import { isEmailAllowed } from './utils/email';
 import { PROMPT_EMAIL_BUTLER as PROMPT_EMAIL_BUTLER } from './prompts/emailBulter';
 import { queryOpenAI } from './utils/openai';
 
@@ -19,13 +18,6 @@ export default {
       console.log(`Received email - From: ${email.from.address}, Subject: "${email.subject}"`);
 
       const sender = email.from.address || 'unknown';
-      const receiver = email.to.address || 'unknown';
-
-      const validation = isEmailAllowed(receiver, env);
-      if (!validation.allowed) {
-        console.log(`Blocked email from: ${validation.originalSender}, Subject: "${email.subject}"`);
-        return;
-      }
 
       const cleanText = removeRepeatedEmptyLines(email.text || '');
       const shortenedText = await replaceWithShortenedUrls(cleanText, env);
