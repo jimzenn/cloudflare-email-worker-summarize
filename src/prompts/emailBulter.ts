@@ -13,6 +13,7 @@ Make sure you response with Markdown that is compatible with Telegram message fo
 Markdown V2:
   examples: *bold text must use single asterisk* _movies books shows name use italic, single underscore_ __underline__ ~strikethrough~ ||spoiler||
   When you need to show a link, use the following format: [Link Text](http://link.com)
+  You should use these special characters only for formatting. Do not use ~ other than for strikethrough. For estimation, use ≈.
 
 Every time you receive an email, start with a uber-super concise title. What is the email about?
 
