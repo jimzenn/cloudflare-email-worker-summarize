@@ -129,22 +129,29 @@ async function resolveUrlToFinal(url: string): Promise<string> {
 
 export async function replaceWithShortenedUrls(text: string, env: Env): Promise<string> {
   const urls = extractUrls(text);
+  const finalUrls = new Set<string>();
 
-  if (urls.length > MAX_URL_SHORTENS) {
-    console.warn(`Too many URLs (${urls.length}) to shorten, skipping`);
-    return urls.reduce((text, url) => text.split(url).join(URL_PLACEHOLDER), text);
+  // Resolve all URLs to their final form
+  await Promise.all(urls.map(async (url) => {
+    const finalUrl = await resolveUrlToFinal(url);
+    finalUrls.add(finalUrl);
+  }));
+
+  const longUrls = [...finalUrls].filter(url => url.length > MIN_URL_LENGTH_FOR_SHORTENING);
+
+  if (longUrls.length > MAX_URL_SHORTENS) {
+    console.warn(`Too many URLs (${longUrls.length}) to shorten, skipping`);
+    return text;
   }
 
+  const shortUrls = await Promise.all(longUrls.map(async (url) => {
+    return await shortenUrl(url, env);
+  }));
+
   const urlMap = new Map<string, string>();
-  await Promise.all(
-    [...new Set(urls)].map(async (url) => {
-      const finalUrl = await resolveUrlToFinal(url);
-      const shortened = finalUrl.length > MIN_URL_LENGTH_FOR_SHORTENING
-        ? await shortenUrl(finalUrl, env)
-        : finalUrl;
-      urlMap.set(url, shortened);
-    })
-  );
+  for (let i = 0; i < longUrls.length; i++) {
+    urlMap.set(longUrls[i], shortUrls[i]);
+  }
 
   return urls.reduce(
     (text, url) => text.split(url).join(urlMap.get(url)!),
