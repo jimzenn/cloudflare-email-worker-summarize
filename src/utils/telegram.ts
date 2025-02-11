@@ -10,7 +10,7 @@ function escapeMarkdownV2(text: string): string {
   // Match markdown links pattern: [text](url)
   const linkPattern = /\[([^\]]+)\]\(([^)]+)\)/g;
   // Added | to special chars, but we'll handle || separately
-  const specialChars = /[>#+={}.!-|]/g;
+  const specialChars = /[>#+={}.!\-|]/g;
   
   // Split text into links and non-links
   const parts: string[] = [];
