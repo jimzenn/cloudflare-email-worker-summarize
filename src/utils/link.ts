@@ -109,12 +109,15 @@ async function resolveUrlToFinal(url: string): Promise<string> {
 
       if (!nextUrl || (response.status >= 200 && response.status < 300)) {
         // No more redirects or successful response
+        console.log('resolved: ', currentUrl);
         return currentUrl;
       }
 
       // Resolve relative URLs
       currentUrl = new URL(nextUrl, currentUrl).toString();
       redirectCount++;
+
+      console.log(`↪️  Redirect ${redirectCount} for ${url}:\n   ⮑ ${currentUrl}`);
     }
 
     console.warn(`Max redirects (${maxRedirects}) reached for ${url}`);
@@ -127,24 +130,20 @@ async function resolveUrlToFinal(url: string): Promise<string> {
 
 export async function replaceWithShortenedUrls(text: string, env: Env): Promise<string> {
   const urls = extractUrls(text);
-  let processedText = text;
-
-  const finalUrls = await Promise.all(
-    urls.map(async (url) => ({
-      original: url,
-      final: await resolveUrlToFinal(url)
-    }))
+  
+  const urlMap = new Map<string, string>();
+  await Promise.all(
+    [...new Set(urls)].map(async (url) => {
+      const finalUrl = await resolveUrlToFinal(url);
+      const shortened = finalUrl.length > MIN_URL_LENGTH_FOR_SHORTENING 
+        ? await shortenUrl(finalUrl, env)
+        : finalUrl;
+      urlMap.set(url, shortened);
+    })
   );
 
-  console.log(finalUrls);
-
-  for (const { original, final } of finalUrls) {
-    var finalUrl = final;
-    if (final.length > MIN_URL_LENGTH_FOR_SHORTENING) {
-      finalUrl = await shortenUrl(final, env);
-    }
-    processedText = processedText.split(original).join(finalUrl);
-  }
-
-  return processedText;
+  return urls.reduce(
+    (text, url) => text.split(url).join(urlMap.get(url)!),
+    text
+  );
 }
