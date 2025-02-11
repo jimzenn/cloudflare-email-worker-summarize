@@ -17,8 +17,8 @@ export async function sendTelegramMessage(sender: string, subject: string, text:
   console.log('Sending Telegram message:', shortenedText);
 
   const msg = [
-    format.bold(subject),
-    "from: " + format.bold(sender),
+    format.bold(escapeMarkdownV2(subject)),
+    "from: " + format.bold(escapeMarkdownV2(sender)),
     format.blockquote(shortenedText)
   ].join('\n\n');
 
