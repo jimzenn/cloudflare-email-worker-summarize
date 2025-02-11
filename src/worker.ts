@@ -4,6 +4,8 @@ import { sendPushoverNotification } from './utils/pushover';
 import { sendTelegramMessage } from './utils/telegram';
 import { Env } from './types/env';
 import { isEmailAllowed } from './utils/email';
+import { SYSTEM_PROMPT as PROMPT_EMAIL_BUTLER } from './prompts/emailBulter';
+import { queryOpenAI } from './utils/openai';
 
 export function removeRepeatedEmptyLines(text: string): string {
   return text.replace(/(\n\s*){3,}/g, '\n\n');
@@ -24,10 +26,15 @@ export default {
 
       const cleanText = removeRepeatedEmptyLines(email.text || '');
       const shortenedText = await replaceWithShortenedUrls(cleanText, env);
+      const summary = await queryOpenAI(
+        PROMPT_EMAIL_BUTLER,
+        shortenedText,
+        env
+      );
 
       await Promise.all([
-        sendPushoverNotification(email.subject, shortenedText, env),
-        sendTelegramMessage(shortenedText, env),
+        sendPushoverNotification(email.subject, summary, env),
+        sendTelegramMessage(summary, env),
       ]);
 
     } catch (error) {

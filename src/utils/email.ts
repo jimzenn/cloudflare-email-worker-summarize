@@ -1,3 +1,5 @@
+import { Env } from '../types/env';
+
 const EMAIL_NORMALIZATION_REGEX = /(\+[^@]+)?@/;
 const ALLOWLIST_SEPARATOR = ',';
 
