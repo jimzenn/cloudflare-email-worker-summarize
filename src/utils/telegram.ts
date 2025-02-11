@@ -5,16 +5,36 @@ import { markdownv2 as format } from 'telegram-format';
 const MAX_TELEGRAM_MESSAGE_LENGTH = 4096;
 const TELEGRAM_API_BASE = 'https://api.telegram.org/bot';
 
-// Types
-interface TelegramResponse {
-  ok: boolean;
-  description?: string;
+// Utility functions
+function escapeParenthesesAndBrackets(text: string): string {
+  // Match markdown links pattern: [text](url)
+  const linkPattern = /\[([^\]]+)\]\(([^)]+)\)/g;
+  
+  // Split text into links and non-links
+  const parts: string[] = [];
+  let lastIndex = 0;
+  
+  for (const match of text.matchAll(linkPattern)) {
+    // Add text before the link with escaped brackets/parentheses
+    const beforeLink = text.slice(lastIndex, match.index)
+      .replace(/[\[\]()]/g, '\\$&');
+    parts.push(beforeLink);
+    
+    // Add the link unchanged
+    parts.push(match[0]);
+    lastIndex = (match.index ?? 0) + match[0].length;
+  }
+  
+  // Add remaining text with escaped brackets/parentheses
+  parts.push(text.slice(lastIndex).replace(/[\[\]()]/g, '\\$&'));
+  
+  return parts.join('');
 }
 
-// Utility functions
 function escapeMarkdownV2(text: string): string {
   const specialChars = /[>#+={}.!-]/g;
-  return text.replace(specialChars, '\\$&');
+  const escapedText = text.replace(specialChars, '\\$&');
+  return escapeParenthesesAndBrackets(escapedText);
 }
 
 function formatMarkdownMessage(subject: string, sender: string, text: string): string {
