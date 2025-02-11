@@ -8,7 +8,7 @@ PUSHOVER_API_URL = "https://api.pushover.net/1/messages.json"
 TELEGRAM_TO_CHAT_ID = "151667449"
 SHORTIO_DOMAIN = "link.zenn.in"
 EMAIL_ALLOWLIST = "jimzenn0@gmail.com,*@zenn.in,cplusherly@gmail.com"
-OPENAI_MODEL = "o1-mini"
+OPENAI_MODEL = "chatgpt-4o-latest"
 
 [observability.logs]
 enabled = true
