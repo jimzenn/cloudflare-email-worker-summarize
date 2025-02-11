@@ -2,7 +2,7 @@ import { Env } from 'types/env';
 
 const SHORTIO_API_URL = 'https://api.short.io/links';
 const SLUG_HASH_LENGTH = 4;
-const MIN_URL_LENGTH_FOR_SHORTENING = 50;
+const MIN_URL_LENGTH_FOR_SHORTENING = 80;
 const MAX_URL_SHORTENS = 10;
 const URL_PLACEHOLDER = 'URL';
 
