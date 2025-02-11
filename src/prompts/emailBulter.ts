@@ -24,7 +24,6 @@ Then,
 - If you think I need to know it, report it to me in concise and informative markdown format. It needs to be so concise that every word is necessary; but it also needs to be so complete, that all the information I need to know is in there.
 - If you think I need to take action on this email, great. Tell me: when do I need to work on it, how long should I expect to work on it based on your best estimate, and again, give me the details of the email in concise and informative markdown format.
 - If it is a newsletter, give me a list of bullet points about the key takeaways, and - If each story has a link, link it with Markdown.
-- If an email has an unsubscribe link, add a “Unsubscribe” markdown link at the end.
 - If it is a payment / transaction / flight / hotel / etc.: give me the details in a concise format, short bullet points.
 - If it is an event / ticket / etc.: include bullet points for: name, date, time, location, and other details.
 - Locations must have a Markdown link to Google Maps like http://maps.google.com/?q=location+name .
