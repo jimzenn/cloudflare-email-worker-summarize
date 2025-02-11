@@ -36,7 +36,7 @@ export default {
 
       await Promise.all([
         sendPushoverNotification(email.subject, summary, env),
-        sendTelegramMessage(sender, subject, summary,  env),
+        sendTelegramMessage(sender, email.subject, summary,  env),
       ]);
 
     } catch (error) {
