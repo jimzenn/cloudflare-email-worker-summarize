@@ -1,0 +1,22 @@
+import { Env } from '../types/env';
+import { CalendarEvent } from '../types/calendarEvent';
+import { generateJWT } from './googleAuth';
+
+export async function createCalendarEvent(env: Env, event: CalendarEvent) {
+
+  const jwt = await generateJWT(JSON.parse(env.GOOGLE_SERVICE_ACCOUNT_JSON_KEY));
+
+  const response = await fetch(
+    `https://www.googleapis.com/calendar/v3/calendars/primary/events`,
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${jwt}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(event),
+    }
+  );
+
+  return await response.json();
+}

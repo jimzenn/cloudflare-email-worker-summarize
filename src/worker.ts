@@ -3,7 +3,7 @@ import { replaceWithShortenedUrls } from './utils/link';
 import { sendPushoverNotification } from './utils/pushover';
 import { sendTelegramMessage } from './utils/telegram';
 import { Env } from './types/env';
-import { PROMPT_EMAIL_BUTLER as PROMPT_EMAIL_BUTLER } from './prompts/emailBulter';
+import { PROMPT_MARKDOWN_V2_SUMMARIZE } from './prompts/emailBulter';
 import { queryOpenAI } from './utils/openai';
 
 export function removeRepeatedEmptyLines(text: string): string {
@@ -15,14 +15,14 @@ export default {
     try {
       const email = await PostalMime.parse(message.raw);
 
-      console.log(`Received email - From: ${email.from.address}, Subject: "${email.subject}"`);
+      console.log(`📥 Received email - From: ${email.from.address}, Subject: "${email.subject}"`);
 
       const sender = email.from.address || 'unknown';
 
       const cleanText = removeRepeatedEmptyLines(email.text || '');
       const shortenedText = await replaceWithShortenedUrls(cleanText, env);
       const summary = await queryOpenAI(
-        PROMPT_EMAIL_BUTLER,
+        PROMPT_MARKDOWN_V2_SUMMARIZE,
         shortenedText,
         env
       );

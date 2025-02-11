@@ -9,5 +9,6 @@ export interface Env {
     EMAIL_ALLOWLIST: string;
     OPENAI_API_KEY: string;
     OPENAI_MODEL: string;
+    GOOGLE_SERVICE_ACCOUNT_JSON_KEY: string;
   }
   

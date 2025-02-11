@@ -1,6 +1,5 @@
 import { Env } from '../types/env';
 import { markdownv2 as format } from 'telegram-format';
-
 // Constants
 const MAX_TELEGRAM_MESSAGE_LENGTH = 4096;
 const TELEGRAM_API_BASE = 'https://api.telegram.org/bot';
