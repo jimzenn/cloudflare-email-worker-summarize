@@ -12,6 +12,7 @@ export async function sendTelegramMessage(text: string, env: Env): Promise<void>
     body: JSON.stringify({
       chat_id: env.TELEGRAM_TO_CHAT_ID,
       text: shortenedText,
+      parse_mode: 'MarkdownV2'
     }),
   });
 }
