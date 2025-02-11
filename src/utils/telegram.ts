@@ -5,7 +5,7 @@ const MAX_TELEGRAM_MESSAGE_LENGTH = 4096;
 const TELEGRAM_API_BASE = 'https://api.telegram.org/bot';
 
 function escapeMarkdownV2(text: string): string {
-  const specialChars = /[`>#+={}.!-]/g;
+  const specialChars = /[>#+={}.!-]/g;
   return text.replace(specialChars, '\\$&');
 }
 

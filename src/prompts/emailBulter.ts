@@ -28,8 +28,6 @@ Then,
 
 Formatting Example:
 
-*Betterment Auto-Deposit Reminder*
-
 - From: *Charles Schwab \\(Main\\) \`••••4270\`* 
 - To: *Betterment \\(General Investing\\)*
 - Amount: \`$200\`
