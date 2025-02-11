@@ -2,7 +2,7 @@ import { Env } from 'types/env';
 
 const SHORTIO_API_URL = 'https://api.short.io/links';
 const SLUG_HASH_LENGTH = 4;
-const MIN_URL_LENGTH_FOR_SHORTENING = 80;
+const MIN_URL_LENGTH_TO_RESOLVE = 80;
 const MAX_URL_SHORTENS = 10;
 const URL_PLACEHOLDER = 'URL';
 
@@ -131,18 +131,21 @@ export async function replaceWithShortenedUrls(text: string, env: Env): Promise<
   const urls = extractUrls(text);
   const finalUrls = new Set<string>();
 
-  // Resolve all URLs to their final form
-  await Promise.all(urls.map(async (url) => {
-    const finalUrl = await resolveUrlToFinal(url);
-    finalUrls.add(finalUrl);
-  }));
-
-  const longUrls = [...finalUrls].filter(url => url.length > MIN_URL_LENGTH_FOR_SHORTENING);
+  const longUrls = [...finalUrls].filter(url => url.length > MIN_URL_LENGTH_TO_RESOLVE);
 
   if (longUrls.length > MAX_URL_SHORTENS) {
     console.warn(`Too many URLs (${longUrls.length}) to shorten, skipping`);
+    for (const url of longUrls) {
+      text = text.replace(url, URL_PLACEHOLDER);
+    }
     return text;
   }
+
+  // Resolve all long URLs to their final form
+  await Promise.all(longUrls.map(async (url) => {
+    const finalUrl = await resolveUrlToFinal(url);
+    finalUrls.add(finalUrl);
+  }));
 
   const shortUrls = await Promise.all(longUrls.map(async (url) => {
     return await shortenUrl(url, env);
