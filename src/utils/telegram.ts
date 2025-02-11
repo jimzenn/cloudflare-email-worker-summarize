@@ -18,7 +18,7 @@ export async function sendTelegramMessage(sender: string, subject: string, text:
   const msg = [
     format.blockquote([
       format.bold(escapeMarkdownV2(subject)),
-      "from: " + format.monospace(escapeMarkdownV2(sender))
+      "from: " + format.monospace(sender)
     ].join('\n')),
     shortenedText
   ].join('\n\n');
