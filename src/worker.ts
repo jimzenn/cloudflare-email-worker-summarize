@@ -4,7 +4,7 @@ import { sendPushoverNotification } from './utils/pushover';
 import { sendTelegramMessage } from './utils/telegram';
 import { Env } from './types/env';
 import { isEmailAllowed } from './utils/email';
-import { SYSTEM_PROMPT as PROMPT_EMAIL_BUTLER } from './prompts/emailBulter';
+import { PROMPT_EMAIL_BUTLER as PROMPT_EMAIL_BUTLER } from './prompts/emailBulter';
 import { queryOpenAI } from './utils/openai';
 
 export function removeRepeatedEmptyLines(text: string): string {
