@@ -18,41 +18,46 @@ export async function sendTelegramMessage(sender: string, subject: string, text:
   const msg = [
     format.blockquote([
       format.bold(escapeMarkdownV2(subject)),
-      "from: " + format.monospace(sender)
+      "from: " + format.monospace(sender),
     ].join('\n')),
     shortenedText
   ].join('\n\n');
 
   console.log('Sending Telegram message:', msg);
 
-  try {
-    const response = await fetch(apiUrl, {
+  const response = await fetch(apiUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      chat_id: env.TELEGRAM_TO_CHAT_ID,
+      text: msg,
+      parse_mode: 'MarkdownV2'
+    }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    console.error('Telegram API error:', {
+      status: response.status,
+      statusText: response.statusText,
+      errorData,
+    });
+    // retry without parse_mode
+    const retry_response = await fetch(apiUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         chat_id: env.TELEGRAM_TO_CHAT_ID,
         text: msg,
-        parse_mode: 'MarkdownV2'
       }),
     });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
+    if (!retry_response.ok) {
+      const errorData = await retry_response.json().catch(() => null);
       console.error('Telegram API error:', {
-        status: response.status,
-        statusText: response.statusText,
+        status: retry_response.status,
+        statusText: retry_response.statusText,
         errorData,
       });
-      throw new Error(`Telegram API error: ${response.status} ${response.statusText}`);
     }
-
-    const data = await response.json();
-    console.log('Telegram message sent successfully.', {
-      messageId: data.result?.message_id,
-      chatId: data.result?.chat?.id,
-    });
-  } catch (error) {
-    console.error('Failed to send Telegram message:', error);
-    throw error;
   }
 }
