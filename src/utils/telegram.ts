@@ -14,7 +14,6 @@ export async function sendTelegramMessage(sender: string, subject: string, text:
   const escapedText = escapeMarkdownV2(text);
   const shortenedText = escapedText.slice(0, MAX_TELEGRAM_MESSAGE_LENGTH);
 
-  console.log('Sending Telegram message:', shortenedText);
 
   const msg = [
     format.blockquote([
@@ -23,6 +22,8 @@ export async function sendTelegramMessage(sender: string, subject: string, text:
     ].join('\n')),
     shortenedText
   ].join('\n\n');
+
+  console.log('Sending Telegram message:', msg);
 
   try {
     const response = await fetch(apiUrl, {
