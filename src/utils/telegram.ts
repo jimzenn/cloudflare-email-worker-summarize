@@ -7,7 +7,7 @@ function escapeMarkdownV2(text: string): string {
   return text.replace(specialChars, '\\$&');
 }
 
-export async function sendTelegramMessage(text: string, env: Env): Promise<void> {
+export async function sendTelegramMessage(text: string, sender: string, env: Env): Promise<void> {
   const apiUrl = `${TELEGRAM_API_BASE}${env.TELEGRAM_BOT_TOKEN}/sendMessage`;
   const escapedText = escapeMarkdownV2(text);
   const shortenedText = escapedText.slice(0, MAX_TELEGRAM_MESSAGE_LENGTH);
@@ -20,7 +20,7 @@ export async function sendTelegramMessage(text: string, env: Env): Promise<void>
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         chat_id: env.TELEGRAM_TO_CHAT_ID,
-        text: shortenedText,
+        text: `\`*from:${sender}*\`\n\n${shortenedText}`,
         parse_mode: 'MarkdownV2'
       }),
     });
