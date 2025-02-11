@@ -19,8 +19,9 @@ export default {
       console.log(`Received email - From: ${email.from.address}, Subject: "${email.subject}"`);
 
       const sender = email.from.address || 'unknown';
+      const receiver = email.to.address || 'unknown';
 
-      const validation = isEmailAllowed(sender, env);
+      const validation = isEmailAllowed(receiver, env);
       if (!validation.allowed) {
         console.log(`Blocked email from: ${validation.originalSender}, Subject: "${email.subject}"`);
         return;
