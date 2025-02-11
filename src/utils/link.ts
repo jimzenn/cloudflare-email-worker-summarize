@@ -3,7 +3,8 @@ import { Env } from 'types/env';
 const SHORTIO_API_URL = 'https://api.short.io/links';
 const SLUG_HASH_LENGTH = 4;
 const MIN_URL_LENGTH_FOR_SHORTENING = 50;
-
+const MAX_URL_SHORTENS = 5;
+const URL_PLACEHOLDER = 'URL';
 
 interface ShortenResponse {
   shortURL?: string;
@@ -116,8 +117,6 @@ async function resolveUrlToFinal(url: string): Promise<string> {
       // Resolve relative URLs
       currentUrl = new URL(nextUrl, currentUrl).toString();
       redirectCount++;
-
-      console.log(`↪️  Redirect ${redirectCount} for ${url}:\n   ⮑ ${currentUrl}`);
     }
 
     console.warn(`Max redirects (${maxRedirects}) reached for ${url}`);
@@ -130,12 +129,17 @@ async function resolveUrlToFinal(url: string): Promise<string> {
 
 export async function replaceWithShortenedUrls(text: string, env: Env): Promise<string> {
   const urls = extractUrls(text);
-  
+
+  // If there are too many URLs, replace them with <URL> instead
+  if (urls.length > MAX_URL_SHORTENS) {
+    return urls.reduce((text, url) => text.split(url).join(URL_PLACEHOLDER), text);
+  }
+
   const urlMap = new Map<string, string>();
   await Promise.all(
     [...new Set(urls)].map(async (url) => {
       const finalUrl = await resolveUrlToFinal(url);
-      const shortened = finalUrl.length > MIN_URL_LENGTH_FOR_SHORTENING 
+      const shortened = finalUrl.length > MIN_URL_LENGTH_FOR_SHORTENING
         ? await shortenUrl(finalUrl, env)
         : finalUrl;
       urlMap.set(url, shortened);

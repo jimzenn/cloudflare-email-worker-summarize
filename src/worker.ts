@@ -15,6 +15,8 @@ export default {
   async email(message: ForwardableEmailMessage, env: Env, ctx: ExecutionContext): Promise<void> {
     try {
       const email = await PostalMime.parse(message.raw);
+      
+      console.log(`Received email - From: ${email.from.address}, Subject: "${email.subject}"`);
 
       const sender = email.from.address || 'unknown';
 

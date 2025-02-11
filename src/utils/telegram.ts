@@ -2,9 +2,22 @@ import { Env } from '../types/env';
 const MAX_TELEGRAM_MESSAGE_LENGTH = 4096;
 const TELEGRAM_API_BASE = 'https://api.telegram.org/bot';
 
+function escapeMarkdownV2(text: string): string {
+  const specialChars = /[\[\]()`>#+={}.!-]/g;
+  // First escape all backslashes
+  let escaped = text.replace(/\\/g, '\\\\');
+  // Then escape all special characters
+  escaped = escaped.replace(specialChars, '\\$&');
+  
+  return escaped;
+}
+
 export async function sendTelegramMessage(text: string, env: Env): Promise<void> {
   const apiUrl = `${TELEGRAM_API_BASE}${env.TELEGRAM_BOT_TOKEN}/sendMessage`;
-  const shortenedText = text.slice(0, MAX_TELEGRAM_MESSAGE_LENGTH);
+  const escapedText = escapeMarkdownV2(text);
+  const shortenedText = escapedText.slice(0, MAX_TELEGRAM_MESSAGE_LENGTH);
+
+  console.log('Sending Telegram message:', shortenedText);
 
   try {
     const response = await fetch(apiUrl, {
