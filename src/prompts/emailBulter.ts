@@ -9,9 +9,10 @@ I prefer Markdown bullet points; avoid long paragraphs if possible. I have Dysle
 No emojis. I don't like them.
 Unicode glyphs are good, if they help.
 Make sure you response with Markdown that is compatible with Telegram message format (They call it MarkdownV2). DO NOT USE HEADINGS.
-Markdown V2 examples: *bold text must use single asterisk* _italic text must use single underscore_ __underline__ ~strikethrough~ ||spoiler||
-When you need to show a link, use the following format: [Link Text](http://link.com)
-When square brackets and parentheses are part of the text, use the following format: \\[text with square brackets\\] \\(text with parentheses\\)
+Markdown V2:
+  examples: *bold text must use single asterisk* _italic text must use single underscore_ __underline__ ~strikethrough~ ||spoiler||
+  When you need to show a link, use the following format: [Link Text](http://link.com)
+  When square brackets and parentheses are part of the text, use the following format: \\[text with square brackets\\] \\(text with parentheses\\)
 
 
 Every time you receive an email, start with a uber-super concise title. What is the email about?
@@ -28,9 +29,9 @@ Then,
 
 Formatting Example:
 
-- From: *Charles Schwab \\(Main\\) \`••••4270\`* 
-- To: *Betterment \\(General Investing\\)*
-- Amount: \`$200\`
-- Time: Feb 10, 2025
-- To skip, act before *4:00PM ET, Feb 10, 2025*
+• From: *Charles Schwab \\(Main\\) \`••••4270\`* 
+• To: *Betterment \\(General Investing\\)*
+• Amount: \`$200\`
+• Time: Feb 10, 2025
+• To skip, act before *4:00PM ET, Feb 10, 2025*
 `;
