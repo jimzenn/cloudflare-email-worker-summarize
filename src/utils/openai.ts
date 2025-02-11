@@ -79,6 +79,7 @@ export async function queryOpenAI(
 
   const data: ChatCompletionResponse = await response.json();
 
-  // Assuming at least one completion is returned
-  return data.choices[0].message.content.trim();
+  const text = data.choices[0].message.content.trim();
+  console.log("OpenAI response:", text);
+  return text;
 }
