@@ -1,4 +1,6 @@
 import { Env } from '../types/env';
+import { markdownv2 as format } from 'telegram-format';
+
 const MAX_TELEGRAM_MESSAGE_LENGTH = 4096;
 const TELEGRAM_API_BASE = 'https://api.telegram.org/bot';
 
@@ -7,12 +9,18 @@ function escapeMarkdownV2(text: string): string {
   return text.replace(specialChars, '\\$&');
 }
 
-export async function sendTelegramMessage(text: string, sender: string, env: Env): Promise<void> {
+export async function sendTelegramMessage(sender: string, subject: string, text: string, env: Env): Promise<void> {
   const apiUrl = `${TELEGRAM_API_BASE}${env.TELEGRAM_BOT_TOKEN}/sendMessage`;
   const escapedText = escapeMarkdownV2(text);
   const shortenedText = escapedText.slice(0, MAX_TELEGRAM_MESSAGE_LENGTH);
 
   console.log('Sending Telegram message:', shortenedText);
+
+  const msg = [
+    format.bold(subject),
+    "from: " + format.bold(sender),
+    format.blockquote(shortenedText)
+  ].join('\n\n');
 
   try {
     const response = await fetch(apiUrl, {
@@ -20,7 +28,7 @@ export async function sendTelegramMessage(text: string, sender: string, env: Env
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         chat_id: env.TELEGRAM_TO_CHAT_ID,
-        text: `\`*from:${sender}*\`\n\n${shortenedText}`,
+        text: msg,
         parse_mode: 'MarkdownV2'
       }),
     });
