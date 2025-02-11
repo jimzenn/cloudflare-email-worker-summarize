@@ -30,7 +30,9 @@ Formatting Example:
 
 *Betterment Auto-Deposit Reminder*
 
-- Happening soon: *Charles Schwab \\(Main\\) \`••••4270\`* → *General Investing* on *Feb 10, 2025*
-- To skip, act before *4:00PM ET Feb 10, 2025*
-- [Unsubscribe](http://unsubscribe.com)
+- From: *Charles Schwab \\(Main\\) \`••••4270\`* 
+- To: *Betterment \\(General Investing\\)*
+- Amount: \`$200\`
+- Time: Feb 10, 2025
+- To skip, act before *4:00PM ET, Feb 10, 2025*
 `;
