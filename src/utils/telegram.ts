@@ -4,12 +4,7 @@ const TELEGRAM_API_BASE = 'https://api.telegram.org/bot';
 
 function escapeMarkdownV2(text: string): string {
   const specialChars = /[`>#+={}.!-]/g;
-  // First escape all backslashes
-  let escaped = text.replace(/\\/g, '\\\\');
-  // Then escape all special characters
-  escaped = escaped.replace(specialChars, '\\$&');
-  
-  return escaped;
+  return text.replace(specialChars, '\\$&');
 }
 
 export async function sendTelegramMessage(text: string, env: Env): Promise<void> {
@@ -41,7 +36,7 @@ export async function sendTelegramMessage(text: string, env: Env): Promise<void>
     }
 
     const data = await response.json();
-    console.log('Telegram message sent successfully:', {
+    console.log('Telegram message sent successfully.', {
       messageId: data.result?.message_id,
       chatId: data.result?.chat?.id,
     });
