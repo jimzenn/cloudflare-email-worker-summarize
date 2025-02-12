@@ -84,7 +84,7 @@ function flightAwareUrl(flightNumber: string) {
 }
 
 const formatPort = (city: string, iataCode: string, terminal?: string, gate?: string) => {
-  const location = `${city} (${format.monospace(iataCode)})`;
+  const location = `${format.bold(city)} (${format.monospace(iataCode)})`;
   const details = [terminal, gate].filter(Boolean).join(' ');
   return details ? `${location} | ${details}` : location;
 };
@@ -111,10 +111,8 @@ function formatFlightTrip(f: FlightTrip) {
     const arrivalPort = formatPort(s.arrivalCity, s.arrivalIataCode, s.arrivalTerminal, s.arrivalGate);
     return [
       `${format.bold(s.airlineName)} \- [${s.flightNumber}](${flightAwareUrl(s.flightNumber)})`,
-      `Departure: ${departurePort}`,
-      `${departureTime}`,
-      `Arrival: ${arrivalPort}`,
-      `${arrivalTime}`
+      `${departurePort} ➔ ${arrivalPort}`,
+      `${departureTime} \- ${arrivalTime}`
     ].join('\n');
   });
 
