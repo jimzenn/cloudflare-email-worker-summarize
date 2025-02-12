@@ -127,7 +127,13 @@ function formatFlightItinery(f: FlightItinery) {
 async function extractFlightItinery(email: ForwardableEmailMessage, env: Env): Promise<FlightItinery> {
   const prompt = PROMPT_EXTRACT_FLIGHT_INFO;
   const response = await queryOpenAI(prompt, email.text, env);
-  return JSON.parse(response);
+  
+  try {
+    return JSON.parse(response);
+  } catch (error) {
+    console.error('[Flight] Failed to parse OpenAI response:', response);
+    throw new Error('Failed to parse flight information from OpenAI response');
+  }
 }
 
 export class FlightHandler {
@@ -136,10 +142,13 @@ export class FlightHandler {
 
   async handle() {
     console.log(`[Flight] Handling ${this.email.subject}`);
-    const flightItinery = await extractFlightItinery(this.email, this.env);
-    // Send a message to the user with the flight itinerary.
-    const message = formatFlightItinery(flightItinery);
-    await sendTelegramMessage(this.email.from.address, this.email.subject, message, this.env);
+    try {
+      const flightItinery = await extractFlightItinery(this.email, this.env);
+      const message = formatFlightItinery(flightItinery);
+      await sendTelegramMessage(this.email.from.address, this.email.subject, message, this.env);
+    } catch (error) {
+      console.error('[Flight] Error processing flight:', error);
+    }
   }
 
 }
