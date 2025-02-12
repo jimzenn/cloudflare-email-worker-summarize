@@ -2,7 +2,6 @@ import PostalMime from 'postal-mime';
 import { dispatchToHandler } from './handlerDispatcher';
 import { PROMPT_TRIAGE } from './prompts/triage';
 import { queryOpenAI } from './services/openai';
-import { sendPushoverNotification } from './services/pushover';
 import { Env } from './types/env';
 import { TriageResponse as TriageInfo } from './types/triageResponse';
 import { createEmailPrompt } from './utils/email';
@@ -23,11 +22,11 @@ export default {
       let triageInfo: TriageInfo;
       try {
         triageInfo = JSON.parse(triageResponse);
-        
+
         const category = triageInfo.category;
         const domainKnowledges = triageInfo.domain_knowledge;
 
-        console.log(`[Triage] ${email.subject} → ${JSON.stringify(triageInfo)}`);
+        console.log(`[Triage] ${email.subject || '(No subject)'} → ${JSON.stringify(triageInfo)}`);
 
         dispatchToHandler(email, category, domainKnowledges, env);
       } catch (parseError) {
