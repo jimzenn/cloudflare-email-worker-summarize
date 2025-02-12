@@ -16,22 +16,18 @@ interface FlightSegment {
   flightNumber: string; // e.g. "DL1234"
 
   departureTime: Date;
-  departureTimeUpdated?: Date;
+  departureTZ?: string; // e.g. "America/Los_Angeles"
   departureCity: string; // e.g. "Los Angeles"
   departureIataCode: string; // e.g. "LAX"
   departureTerminal?: string; // e.g. "1"
-  departureTZ?: string; // e.g. "America/Los_Angeles"
   departureGate?: string; // e.g. "12"
-  departureGateUpdated?: string; // e.g. "12"
 
   arrivalTime: Date;
-  arrivalTimeUpdated?: Date;
+  arrivalTZ?: string; // e.g. "America/San_Francisco"
   arrivalCity: string; // e.g. "San Francisco"
   arrivalIataCode: string; // e.g. "SFO"
   arrivalTerminal?: string; // e.g. "International"
-  arrivalTZ?: string; // e.g. "America/San_Francisco"
   arrivalGate?: string; // e.g. "12"
-  arrivalGateUpdated?: string; // e.g. "12"
 }
 
 interface FlightTrip {
@@ -50,17 +46,17 @@ interface FlightSegment {
   flightNumber: string; // e.g. "DL1234"
 
   departureTime: Date;
+  departureTZ: string; // e.g. "America/Los_Angeles"
   departureCity: string; // e.g. "Los Angeles"
   departureIataCode: string; // e.g. "LAX"
   departureTerminal?: string; // e.g. "1"
-  departureTZ?: string; // e.g. "America/Los_Angeles"
   departureGate?: string; // e.g. "12"
 
   arrivalTime: Date;
+  arrivalTZ: string; // e.g. "America/San_Francisco"
   arrivalCity: string; // e.g. "San Francisco"
   arrivalIataCode: string; // e.g. "SFO"
   arrivalTerminal?: string; // e.g. "International"
-  arrivalTZ?: string; // e.g. "America/San_Francisco"
   arrivalGate?: string; // e.g. "12"
 }
 
