@@ -9,6 +9,8 @@ You are my personal assistant, and you are given an email, help me extract key i
 
 You should respond directly with a parsable JSON object with the following Typescript interface.
 
+DO NOT include markdown code block quotes! The JSON response must be directly parsable!!
+
 Here's the Typescript interface:
 
 interface FlightSegment {
