@@ -1,10 +1,9 @@
 import { Env } from '../types/env';
 import { markdownv2 as format } from 'telegram-format';
-// Constants
+
 const MAX_TELEGRAM_MESSAGE_LENGTH = 4096;
 const TELEGRAM_API_BASE = 'https://api.telegram.org/bot';
 
-// Utility functions
 function escapeParenthesesAndBrackets(text: string): string {
   // Match markdown links pattern: [text](url)
   const linkPattern = /\[([^\]]+)\]\(([^)]+)\)/g;
@@ -14,9 +13,9 @@ function escapeParenthesesAndBrackets(text: string): string {
   let lastIndex = 0;
   
   for (const match of text.matchAll(linkPattern)) {
-    // Add text before the link with escaped brackets/parentheses
+    // Add text before the link, escaping unescaped brackets/parentheses
     const beforeLink = text.slice(lastIndex, match.index)
-      .replace(/[\[\]()]/g, '\\$&');
+      .replace(/(?<!\\)[\[\]()]/g, '\\$&');
     parts.push(beforeLink);
     
     // Add the link unchanged
@@ -24,18 +23,18 @@ function escapeParenthesesAndBrackets(text: string): string {
     lastIndex = (match.index ?? 0) + match[0].length;
   }
   
-  // Add remaining text with escaped brackets/parentheses
-  parts.push(text.slice(lastIndex).replace(/[\[\]()]/g, '\\$&'));
+  // Add remaining text, escaping unescaped brackets/parentheses
+  parts.push(text.slice(lastIndex).replace(/(?<!\\)[\[\]()]/g, '\\$&'));
   
   return parts.join('');
 }
 
 function escapeMarkdownV2(text: string): string {
-  const specialChars = /[>#+={}.!\-|]/g;
+  const specialChars = /(?<!\\)[>#+={}.!\-|]/g;
   const escapedText = text
-  .replace(/\|\|/g, '{{DOUBLEPIPE}}') // Temporarily replace || with placeholder
-  .replace(specialChars, '\\$&')
-  .replace(/{{DOUBLEPIPE}}/g, '||'); // Restore || without escaping
+    .replace(/\|\|/g, '{{DOUBLEPIPE}}') // Temporarily replace || with placeholder
+    .replace(specialChars, '\\$&')
+    .replace(/{{DOUBLEPIPE}}/g, '||'); // Restore || without escaping
   return escapeParenthesesAndBrackets(escapedText);
 }
 
