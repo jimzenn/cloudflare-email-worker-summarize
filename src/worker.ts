@@ -3,9 +3,10 @@ import { replaceWithShortenedUrls } from './utils/link';
 import { sendPushoverNotification } from './utils/pushover';
 import { sendTelegramMessage } from './utils/telegram';
 import { Env } from './types/env';
-import { PROMPT_MARKDOWN_V2_SUMMARIZE } from './prompts/emailBulter';
+import { PROMPT_MARKDOWN_V2_SUMMARIZE } from './prompts/emailButler';
+import { PROMPT_TRIAGE } from './prompts/triage';
 import { queryOpenAI } from './utils/openai';
-
+import { TriageResponse } from './types/triageResponse';
 export function removeRepeatedEmptyLines(text: string): string {
   return text.replace(/(\n\s*){3,}/g, '\n\n');
 }
@@ -27,6 +28,14 @@ export default {
         `To: ${email.to.map((to: { name: string, address: string }) => `${to.name} <${to.address}>`).join(', ')}`,
         shortenedText
       ].join('\n');
+
+      const triageResponse = await queryOpenAI(
+        PROMPT_TRIAGE,
+        userPrompt,
+        env
+      );
+      const parsedTriageResponse: TriageResponse = JSON.parse(triageResponse);
+
       const summary = await queryOpenAI(
         PROMPT_MARKDOWN_V2_SUMMARIZE,
         userPrompt,
@@ -34,7 +43,7 @@ export default {
       );
 
       await Promise.all([
-        sendPushoverNotification(email.subject, summary, env),
+        sendPushoverNotification(email.subject, JSON.stringify(parsedTriageResponse), env),
         sendTelegramMessage(sender, email.subject, summary, env),
       ]);
 

@@ -80,6 +80,6 @@ export async function queryOpenAI(
   const data: ChatCompletionResponse = await response.json();
 
   const text = data.choices[0].message.content.trim();
-  console.log("OpenAI response:", text);
+  console.log(`[OpenAI | ${model}] ${text}`);
   return text;
 }
