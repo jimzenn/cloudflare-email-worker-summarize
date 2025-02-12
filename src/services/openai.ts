@@ -78,6 +78,7 @@ export async function queryOpenAI(
 
   if (!response.ok) {
     const errorText = await response.text();
+    console.error(`[OpenAI | ${model}] Error: ${errorText}`);
     throw new Error(`OpenAI API error ${response.status}: ${errorText}`);
   }
 
