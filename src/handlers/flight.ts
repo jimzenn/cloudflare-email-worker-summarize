@@ -17,14 +17,14 @@ interface FlightSegment {
   airlineName: string; // e.g. "Delta Airlines"
   flightNumber: string; // e.g. "DL1234"
 
-  departureTime: Date;
+  departureTime: string;  // e.g. "2025-02-13T12:00:00Z"
   departureTZ?: string; // e.g. "America/Los_Angeles"
   departureCity: string; // e.g. "Los Angeles"
   departureIataCode: string; // e.g. "LAX"
   departureTerminal?: string; // e.g. "1"
   departureGate?: string; // e.g. "12"
 
-  arrivalTime: Date;
+  arrivalTime: string;  // e.g. "2025-02-13T12:00:00Z"
   arrivalTZ?: string; // e.g. "America/San_Francisco"
   arrivalCity: string; // e.g. "San Francisco"
   arrivalIataCode: string; // e.g. "SFO"
@@ -48,14 +48,14 @@ interface FlightSegment {
   airlineName: string; // e.g. "Delta Airlines"
   flightNumber: string; // e.g. "DL1234"
 
-  departureTime: Date;
+  departureTime: string;  // e.g. "2025-02-13T12:00:00Z"
   departureTZ: string; // e.g. "America/Los_Angeles"
   departureCity: string; // e.g. "Los Angeles"
   departureIataCode: string; // e.g. "LAX"
   departureTerminal?: string; // e.g. "1"
   departureGate?: string; // e.g. "12"
 
-  arrivalTime: Date;
+  arrivalTime: string;  // e.g. "2025-02-13T12:00:00Z"
   arrivalTZ: string; // e.g. "America/San_Francisco"
   arrivalCity: string; // e.g. "San Francisco"
   arrivalIataCode: string; // e.g. "SFO"
@@ -78,8 +78,8 @@ interface FlightItinery {
 function formatFlightTrip(f: FlightTrip) {
   const departureCity = f.segments[0].departureCity;
   const arrivalCity = f.segments[f.segments.length - 1].arrivalCity;
-  const departureTime = f.segments[0].departureTime;
-  const arrivalTime = f.segments[f.segments.length - 1].arrivalTime;
+  const departureTime = new Date(f.segments[0].departureTime);
+  const arrivalTime = new Date(f.segments[f.segments.length - 1].arrivalTime);
   const totalDuration = arrivalTime.getTime() - departureTime.getTime();
   const totalDurationHourMinute = `${Math.floor(totalDuration / (1000 * 60 * 60))}h ${Math.floor((totalDuration % (1000 * 60 * 60)) / (1000 * 60))}m`;
 
@@ -103,8 +103,8 @@ function formatFlightTrip(f: FlightTrip) {
   };
 
   const segmentMarkdowns = f.segments.map(s => {
-    const departureTime = formatDateTime(s.departureTime, s.departureTZ);
-    const arrivalTime = formatDateTime(s.arrivalTime, s.arrivalTZ);
+    const departureTime = formatDateTime(new Date(s.departureTime), s.departureTZ);
+    const arrivalTime = formatDateTime(new Date(s.arrivalTime), s.arrivalTZ);
     const departurePort = formatPort(s.departureTerminal, s.departureGate);
     const arrivalPort = formatPort(s.arrivalTerminal, s.arrivalGate);
     return [
