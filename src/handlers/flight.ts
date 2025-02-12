@@ -104,16 +104,24 @@ function formatFlightTrip(f: FlightTrip) {
     `${f.segments.length - 1} layover${f.segments.length - 1 === 1 ? '' : 's'}`,
   ].join('\n');
 
-  const segmentMarkdowns = f.segments.map(s => {
+  const segmentMarkdowns = f.segments.map((s, index) => {
     const departureTime = formatDateTime(new Date(s.departureTime), s.departureTZ);
     const arrivalTime = formatDateTime(new Date(s.arrivalTime), s.arrivalTZ);
     const departurePort = formatPort(s.departureCity, s.departureIataCode, s.departureTerminal, s.departureGate);
     const arrivalPort = formatPort(s.arrivalCity, s.arrivalIataCode, s.arrivalTerminal, s.arrivalGate);
-    return [
+    const segment = [
       `${format.bold(s.airlineName)} \- [${s.flightNumber}](${flightAwareUrl(s.flightNumber)})`,
       `${departurePort} ➔ ${arrivalPort}`,
       `${departureTime} \- ${arrivalTime}`
-    ].join('\n');
+    ];
+
+    if (index < f.segments.length - 1) {
+      const nextSegment = f.segments[index + 1];
+      const layoverDuration = new Date(nextSegment.departureTime).getTime() - new Date(s.arrivalTime).getTime();
+      segment.push(`\n${format.italic(`Layover in ${s.arrivalCity}: ${formatDuration(layoverDuration)}`)}`);
+    }
+
+    return segment;
   });
 
   return [header, ...segmentMarkdowns].join('\n');
