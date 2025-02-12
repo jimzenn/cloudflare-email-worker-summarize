@@ -133,6 +133,7 @@ export class FlightHandler {
   }
 
   async handle() {
+    console.log(`[Flight] Handling ${this.email.subject}`);
     const flightItinery = await extractFlightItinery(this.email, this.env);
     // Send a message to the user with the flight itinerary.
     const message = formatFlightItinery(flightItinery);

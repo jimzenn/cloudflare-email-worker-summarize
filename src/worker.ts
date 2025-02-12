@@ -1,5 +1,5 @@
 import PostalMime from 'postal-mime';
-import { emailHandlerDispatcher } from './handlerDispatcher';
+import { dispatchToHandler } from './handlerDispatcher';
 import { PROMPT_SUMMARIZE_MARKDOWN_V2 } from './prompts/actions';
 import { PROMPT_TRIAGE } from './prompts/triage';
 import { queryOpenAI } from './services/openai';
@@ -44,7 +44,7 @@ export default {
         const domainKnowledges = triageInfo.domain_knowledge;
         sendPushoverNotification(email.subject, JSON.stringify(triageInfo), env);
         console.log(`[Triage] ${email.subject} → ${JSON.stringify(triageInfo)}`);
-        emailHandlerDispatcher(email, category, domainKnowledges, env);
+        dispatchToHandler(email, category, domainKnowledges, env);
       } catch (parseError) {
         console.error('Failed to parse triage response:', triageResponse);
       }
