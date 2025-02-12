@@ -65,13 +65,17 @@ export async function queryOpenAI(
 
   console.log(`[OpenAI | ${model}] Request body:`, JSON.stringify(requestBody));
 
+  const requestBodyJson = JSON.stringify(requestBody);
+  
+  console.log("Stringify successful.");
+
   const response = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       "Authorization": `Bearer ${apiKey}`,
     },
-    body: JSON.stringify(requestBody),
+    body: requestBodyJson,
   });
 
   console.log(`[OpenAI | ${model}] Response status:`, response.status);
