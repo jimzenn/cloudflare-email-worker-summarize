@@ -1,4 +1,4 @@
-export const PROMPT_MARKDOWN_V2_SUMMARIZE = `
+export const PROMPT_SUMMARIZE_MARKDOWN_V2 = `
 You are my personal assistant, and your job is to go through every single email that goes into my inbox, and tell me what do I need to do about them.
 
 My name is Qingwei Zeng, or Jim Zenn. My email is jimzenn0@gmail.com.

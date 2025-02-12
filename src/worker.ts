@@ -1,12 +1,14 @@
 import PostalMime from 'postal-mime';
-import { replaceWithShortenedUrls } from './utils/link';
-import { sendPushoverNotification } from './utils/pushover';
-import { sendTelegramMessage } from './utils/telegram';
-import { Env } from './types/env';
-import { PROMPT_MARKDOWN_V2_SUMMARIZE } from './prompts/emailButler';
+import { emailHandlerDispatcher } from './handlerDispatcher';
+import { PROMPT_SUMMARIZE_MARKDOWN_V2 } from './prompts/actions';
 import { PROMPT_TRIAGE } from './prompts/triage';
-import { queryOpenAI } from './utils/openai';
-import { TriageResponse } from './types/triageResponse';
+import { queryOpenAI } from './services/openai';
+import { sendPushoverNotification } from './services/pushover';
+import { sendTelegramMessage } from './services/telegram';
+import { Env } from './types/env';
+import { TriageResponse as TriageInfo } from './types/triageResponse';
+import { replaceWithShortenedUrls } from './utils/link';
+
 export function removeRepeatedEmptyLines(text: string): string {
   return text.replace(/(\n\s*){3,}/g, '\n\n');
 }
@@ -34,18 +36,26 @@ export default {
         userPrompt,
         env
       );
-      const parsedTriageResponse: TriageResponse = JSON.parse(triageResponse);
+
+      let triageInfo: TriageInfo;
+      try {
+        triageInfo = JSON.parse(triageResponse);
+        const category = triageInfo.category;
+        const domainKnowledges = triageInfo.domain_knowledge;
+        sendPushoverNotification(email.subject, JSON.stringify(triageInfo), env);
+        console.log(`[Triage] ${email.subject} → ${JSON.stringify(triageInfo)}`);
+        emailHandlerDispatcher(email, category, domainKnowledges, env);
+      } catch (parseError) {
+        console.error('Failed to parse triage response:', triageResponse);
+      }
 
       const summary = await queryOpenAI(
-        PROMPT_MARKDOWN_V2_SUMMARIZE,
+        PROMPT_SUMMARIZE_MARKDOWN_V2,
         userPrompt,
         env
       );
 
-      await Promise.all([
-        sendPushoverNotification(email.subject, JSON.stringify(parsedTriageResponse), env),
-        sendTelegramMessage(sender, email.subject, summary, env),
-      ]);
+      await sendTelegramMessage(sender, email.subject, summary, env);
 
     } catch (error) {
       console.error('Email processing failed:', error);

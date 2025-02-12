@@ -1,6 +1,6 @@
 import { Env } from '../types/env';
 import { CalendarEvent } from '../types/calendarEvent';
-import { generateJWT } from './googleAuth';
+import { generateJWT } from '../utils/jwt';
 
 export async function createCalendarEvent(env: Env, event: CalendarEvent) {
 
