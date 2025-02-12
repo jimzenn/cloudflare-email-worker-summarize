@@ -74,12 +74,16 @@ export async function queryOpenAI(
     body: JSON.stringify(requestBody),
   });
 
+  console.log(`[OpenAI | ${model}] Response status:`, response.status);
+
   if (!response.ok) {
     const errorText = await response.text();
     throw new Error(`OpenAI API error ${response.status}: ${errorText}`);
   }
 
   const data: ChatCompletionResponse = await response.json();
+
+  console.log(`[OpenAI | ${model}] Response data:`, JSON.stringify(data));
 
   if (!data.choices || data.choices.length === 0) {
     const error = new Error('OpenAI API returned no choices');
