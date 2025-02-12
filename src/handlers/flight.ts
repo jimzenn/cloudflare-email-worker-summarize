@@ -137,13 +137,23 @@ function formatFlightItinery(f: FlightItinery) {
 
 async function extractFlightItinery(email: ForwardableEmailMessage, env: Env): Promise<FlightItinery> {
   const prompt = PROMPT_EXTRACT_FLIGHT_INFO;
-  const response = await queryOpenAI(prompt, email.text, env);
+  console.log('[Flight] Sending email text to OpenAI:', email.text.substring(0, 200) + '...');
   
   try {
-    return JSON.parse(response);
+    const response = await queryOpenAI(prompt, email.text, env);
+    console.log('[Flight] Raw OpenAI response:', response);
+    
+    const parsed = JSON.parse(response);
+    console.log('[Flight] Successfully parsed response into FlightItinery');
+    return parsed;
   } catch (error) {
-    console.error('[Flight] Failed to parse OpenAI response:', response);
-    throw new Error('Failed to parse flight information from OpenAI response');
+    if (error instanceof SyntaxError) {
+      console.error('[Flight] JSON parsing error:', error.message);
+      console.error('[Flight] Invalid OpenAI response:', response);
+    } else {
+      console.error('[Flight] Unexpected error during flight extraction:', error);
+    }
+    throw error; // Re-throw to maintain existing error handling
   }
 }
 
