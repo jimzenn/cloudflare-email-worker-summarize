@@ -66,43 +66,63 @@ export async function queryOpenAI(
   console.log(`[OpenAI | ${model}] Request body:`, JSON.stringify(requestBody));
 
   const requestBodyJson = JSON.stringify(requestBody);
-  
+
   console.log("Stringify successful.");
 
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${apiKey}`,
-    },
-    body: requestBodyJson,
-  });
+  const controller = new AbortController();
+  const timeoutMs = 10000; // 10 seconds timeout
+  const timeoutId = setTimeout(() => {
+    console.log(`[OpenAI | ${model}] Request timed out after ${timeoutMs}ms`);
+    controller.abort();
+  }, timeoutMs);
 
-  console.log(`[OpenAI | ${model}] Response status:`, response.status);
+  try {
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`,
+      },
+      body: requestBodyJson,
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId); // Clear timeout if request completes
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error(`[OpenAI | ${model}] Error: ${errorText}`);
-    throw new Error(`OpenAI API error ${response.status}: ${errorText}`);
+    console.log(`[OpenAI | ${model}] Response status:`, response.status);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`[OpenAI | ${model}] Error: ${errorText}`);
+      throw new Error(`OpenAI API error ${response.status}: ${errorText}`);
+    }
+
+    const data: ChatCompletionResponse = await response.json();
+
+    console.log(`[OpenAI | ${model}] Response data:`, JSON.stringify(data));
+
+    if (!data.choices || data.choices.length === 0) {
+      const error = new Error('OpenAI API returned no choices');
+      console.error('[OpenAI] Error:', error, 'Full response:', data);
+      throw error;
+    }
+
+    if (!data.choices[0].message?.content) {
+      const error = new Error('OpenAI API response missing message content');
+      console.error('[OpenAI] Error:', error, 'First choice:', data.choices[0]);
+      throw error;
+    }
+
+    const text = data.choices[0].message.content.trim();
+    console.log(`[OpenAI | ${model}] ${text}`);
+    return text;
+  } catch (error) {
+    clearTimeout(timeoutId); // Ensure timeout is cleared on error
+    if (error.name === 'AbortError') {
+      console.error(`[OpenAI | ${model}] Request timed out after ${timeoutMs}ms`);
+      throw new Error(`Request timed out after ${timeoutMs}ms`);
+    } else {
+      console.error(`[OpenAI | ${model}] Network/request error:`, error);
+      throw error; // Re-throw other errors
+    }
   }
-
-  const data: ChatCompletionResponse = await response.json();
-
-  console.log(`[OpenAI | ${model}] Response data:`, JSON.stringify(data));
-
-  if (!data.choices || data.choices.length === 0) {
-    const error = new Error('OpenAI API returned no choices');
-    console.error('[OpenAI] Error:', error, 'Full response:', data);
-    throw error;
-  }
-
-  if (!data.choices[0].message?.content) {
-    const error = new Error('OpenAI API response missing message content');
-    console.error('[OpenAI] Error:', error, 'First choice:', data.choices[0]);
-    throw error;
-  }
-
-  const text = data.choices[0].message.content.trim();
-  console.log(`[OpenAI | ${model}] ${text}`);
-  return text;
 }
