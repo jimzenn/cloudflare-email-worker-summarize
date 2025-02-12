@@ -3,6 +3,7 @@ import { ForwardableEmailMessage } from "postal-mime";
 import { queryOpenAI } from "../services/openai";
 import { sendTelegramMessage } from "../services/telegram";
 import { markdownv2 as format } from 'telegram-format';
+import { formatDateTime, formatDuration } from "../utils/datetime";
 
 export const PROMPT_EXTRACT_FLIGHT_INFO = `
 You are my personal assistant, and you are given an email, help me extract key information.
@@ -81,19 +82,13 @@ function formatFlightTrip(f: FlightTrip) {
   const departureTime = new Date(f.segments[0].departureTime);
   const arrivalTime = new Date(f.segments[f.segments.length - 1].arrivalTime);
   const totalDuration = arrivalTime.getTime() - departureTime.getTime();
-  const totalDurationHourMinute = `${Math.floor(totalDuration / (1000 * 60 * 60))}h ${Math.floor((totalDuration % (1000 * 60 * 60)) / (1000 * 60))}m`;
 
   const header = [
     `${format.bold(departureCity)} ➔ ${format.bold(arrivalCity)}`,
     `${f.flightClass}`,
     `${format.monospace(f.confirmation_code)}`,
-    `${totalDurationHourMinute} ${f.segments.length - 1} layover${f.segments.length - 1 === 1 ? '' : 's'}`,
+    `${formatDuration(totalDuration)} ${f.segments.length - 1} layover${f.segments.length - 1 === 1 ? '' : 's'}`,
   ].join('\n');
-
-  const formatDateTime = (date: Date, tz?: string) => {
-    if (!tz) return date.toLocaleString();
-    return date.toLocaleString('en-US', { timeZone: tz });
-  };
 
   const formatPort = (terminal?: string, gate?: string) => {
     if (!terminal && !gate) return '';
