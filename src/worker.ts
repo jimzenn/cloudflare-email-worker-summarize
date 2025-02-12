@@ -15,7 +15,7 @@ export default {
     try {
       const email = await PostalMime.parse(message.raw);
 
-      console.log(`📥 Received email - From: ${email.from.address}, Subject: "${email.subject}"`);
+      console.log(`📥 From: ${email.from.address}, Subject: "${email.subject}"`);
 
       const sender = email.from.address || 'unknown';
 
