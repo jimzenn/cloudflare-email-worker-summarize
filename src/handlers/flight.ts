@@ -4,6 +4,7 @@ import { queryOpenAI } from "../services/openai";
 import { sendTelegramMessage } from "../services/telegram";
 import { markdownv2 as format } from 'telegram-format';
 import { formatDateTime, formatDuration } from "../utils/datetime";
+import { createEmailPrompt } from "../utils/email";
 
 export const PROMPT_EXTRACT_FLIGHT_INFO = `
 You are my personal assistant, and you are given an email, help me extract key information.
@@ -141,7 +142,7 @@ async function extractFlightItinery(email: ForwardableEmailMessage, env: Env): P
   
   let response: string;
   try {
-    response = await queryOpenAI(prompt, email.text, env);
+    response = await queryOpenAI(prompt, await createEmailPrompt(email, env), env);
     console.log('[Flight] Raw OpenAI response:', response);
     
     const parsed = JSON.parse(response);

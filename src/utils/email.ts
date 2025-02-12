@@ -1,12 +1,13 @@
 import { Env } from "../types/env";
 import { replaceWithShortenedUrls } from "./link";
+import { ForwardableEmailMessage } from "postal-mime";
 
 export function removeRepeatedEmptyLines(text: string): string {
     return text.replace(/(\n\s*){3,}/g, '\n\n');
   }
   
 
-export async function createEmailPrompt(email, env: Env): Promise<string> {
+export async function createEmailPrompt(email: ForwardableEmailMessage, env: Env): Promise<string> {
   const cleanText = removeRepeatedEmptyLines(email.text || '');
   const shortenedText = await replaceWithShortenedUrls(cleanText, env);
   const userPrompt = [
