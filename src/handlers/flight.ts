@@ -15,7 +15,6 @@ DO NOT include markdown code block quotes! The JSON response must be directly pa
 Here's the Typescript interface:
 
 interface FlightSegment {
-  passengerName: string; // e.g. "John Doe"
   airlineName: string; // e.g. "Delta Airlines"
   flightNumber: string; // e.g. "DL1234"
   seatNumber?: string; // e.g. "12A"
@@ -42,6 +41,7 @@ interface FlightTrip {
 }
 
 interface FlightItinery {
+  passengerName: string; // e.g. "John Doe"
   trips: FlightTrip[];
   additional_notes?: string[];
 }
@@ -99,7 +99,7 @@ function formatFlightTrip(f: FlightTrip) {
   const header = [
     `${format.bold(departureCity)} ➔ ${format.bold(arrivalCity)}`,
     `${f.flightClass}`,
-    `${format.bold(format.monospace(f.confirmation_code))}`,
+    `Confirmation Code: ${format.bold(format.monospace(f.confirmation_code))}`,
     `${formatDuration(totalDuration)}`,
     `${f.segments.length - 1} layover${f.segments.length - 1 === 1 ? '' : 's'}`,
   ].join('\n');
@@ -110,7 +110,7 @@ function formatFlightTrip(f: FlightTrip) {
     const departurePort = formatPort(s.departureCity, s.departureIataCode, s.departureTerminal, s.departureGate);
     const arrivalPort = formatPort(s.arrivalCity, s.arrivalIataCode, s.arrivalTerminal, s.arrivalGate);
     return [
-      `${format.bold(s.airlineName)} \- [${format.monospace(s.flightNumber)}](${flightAwareUrl(s.flightNumber)})`,
+      `${format.bold(s.airlineName)} \- [${s.flightNumber}](${flightAwareUrl(s.flightNumber)})`,
       `Departure: ${departurePort}`,
       `${departureTime}`,
       `Arrival: ${arrivalPort}`,
@@ -122,7 +122,11 @@ function formatFlightTrip(f: FlightTrip) {
 }
 
 function formatFlightItinery(f: FlightItinery) {
-  return f.trips.map(formatFlightTrip).join('\n\n');
+  return [
+    `Passenger: *${f.passengerName}*`,
+    ...f.trips.map(formatFlightTrip),
+    ...(f.additional_notes ? [`*Additional Notes:* ${f.additional_notes.join(', ')}`] : []),
+  ].join('\n\n');
 }
 
 async function extractFlightItinery(email: ForwardableEmailMessage, env: Env): Promise<FlightItinery> {
