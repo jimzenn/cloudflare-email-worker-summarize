@@ -40,6 +40,7 @@ interface FlightTrip {
 
 interface FlightItinery {
   trips: FlightTrip[];
+  additional_notes?: string[];
 }
 `
 
@@ -70,6 +71,7 @@ interface FlightTrip {
 
 interface FlightItinery {
   trips: FlightTrip[];
+  additional_notes?: string[];
 }
 
 
