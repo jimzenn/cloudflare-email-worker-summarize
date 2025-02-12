@@ -1,9 +1,11 @@
 import { format } from 'date-fns';
-import { zonedTimeToUtc } from 'date-fns-tz';
+import { formatInTimeZone } from 'date-fns-tz';
 
 export const formatDateTime = (date: Date, tz?: string): string => {
-  const targetDate = tz ? zonedTimeToUtc(date, tz) : date;
-  return format(targetDate, 'yyyy/MM/dd h:mm aa');
+  if (!tz) {
+    return format(date, 'yyyy/MM/dd h:mm aa');
+  }
+  return formatInTimeZone(date, tz, 'yyyy/MM/dd h:mm aa');
 };
 
 export const formatDuration = (durationMs: number): string => {
