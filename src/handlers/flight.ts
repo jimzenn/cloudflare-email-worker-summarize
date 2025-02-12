@@ -146,7 +146,9 @@ export class FlightHandler {
     console.log(`[Flight] Handling ${this.email.subject}`);
     try {
       const flightItinery = await extractFlightItinery(this.email, this.env);
+      console.log('[Flight] Extracted flight itinery:', flightItinery);
       const message = formatFlightItinery(flightItinery);
+      console.log('[Flight] Formatted flight itinery:', message);
       await sendTelegramMessage(this.email.from.address, this.email.subject, message, this.env);
     } catch (error) {
       console.error('[Flight] Error processing flight:', error);
