@@ -15,8 +15,10 @@ DO NOT include markdown code block quotes! The JSON response must be directly pa
 Here's the Typescript interface:
 
 interface FlightSegment {
+  passengerName: string; // e.g. "John Doe"
   airlineName: string; // e.g. "Delta Airlines"
   flightNumber: string; // e.g. "DL1234"
+  seatNumber?: string; // e.g. "12A"
 
   departureTime: string;  // e.g. "2025-02-13T12:00:00Z"
   departureTZ?: string; // e.g. "America/Los_Angeles"
@@ -48,6 +50,7 @@ interface FlightItinery {
 interface FlightSegment {
   airlineName: string; // e.g. "Delta Airlines"
   flightNumber: string; // e.g. "DL1234"
+  seatNumber?: string; // e.g. "12A"
 
   departureTime: string;  // e.g. "2025-02-13T12:00:00Z"
   departureTZ: string; // e.g. "America/Los_Angeles"
@@ -66,15 +69,25 @@ interface FlightSegment {
 
 interface FlightTrip {
   confirmation_code: string;  // e.g. "H3VTK8"
-  flightClass: string; // e.g. "Economy"
+  flightClass: string; // e.g. "Economy", "Main Cabin", "First Class"
   segments: FlightSegment[];
 }
 
 interface FlightItinery {
+  passengerName: string; // e.g. "John Doe"
   trips: FlightTrip[];
-  additional_notes?: string[];
+  additional_notes?: string[];  // e.g. "No checked bags", "Non-refundable", etc.
 }
 
+function flightAwareUrl(flightNumber: string) {
+  return `https://flightaware.com/live/flight/${flightNumber}`;
+}
+
+const formatPort = (city: string, iataCode: string, terminal?: string, gate?: string) => {
+  const location = `${city} (${format.monospace(iataCode)})`;
+  const details = [terminal, gate].filter(Boolean).join(' ');
+  return details ? `${location} | ${details}` : location;
+};
 
 function formatFlightTrip(f: FlightTrip) {
   const departureCity = f.segments[0].departureCity;
@@ -86,30 +99,22 @@ function formatFlightTrip(f: FlightTrip) {
   const header = [
     `${format.bold(departureCity)} ➔ ${format.bold(arrivalCity)}`,
     `${f.flightClass}`,
-    `${format.monospace(f.confirmation_code)}`,
-    `${formatDuration(totalDuration)} ${f.segments.length - 1} layover${f.segments.length - 1 === 1 ? '' : 's'}`,
+    `${format.bold(format.monospace(f.confirmation_code))}`,
+    `${formatDuration(totalDuration)}`,
+    `${f.segments.length - 1} layover${f.segments.length - 1 === 1 ? '' : 's'}`,
   ].join('\n');
-
-  const formatPort = (terminal?: string, gate?: string) => {
-    if (!terminal && !gate) return '';
-    if (terminal && !gate) return `(${terminal})`;
-    if (!terminal && gate) return `(${gate})`;
-    return `(${terminal} ${gate})`;
-  };
 
   const segmentMarkdowns = f.segments.map(s => {
     const departureTime = formatDateTime(new Date(s.departureTime), s.departureTZ);
     const arrivalTime = formatDateTime(new Date(s.arrivalTime), s.arrivalTZ);
-    const departurePort = formatPort(s.departureTerminal, s.departureGate);
-    const arrivalPort = formatPort(s.arrivalTerminal, s.arrivalGate);
+    const departurePort = formatPort(s.departureCity, s.departureIataCode, s.departureTerminal, s.departureGate);
+    const arrivalPort = formatPort(s.arrivalCity, s.arrivalIataCode, s.arrivalTerminal, s.arrivalGate);
     return [
-      `${format.bold(s.airlineName)} \- ${format.monospace(s.flightNumber)}`,
-      `Departure: ${format.monospace(s.departureIataCode)}`,
+      `${format.bold(s.airlineName)} \- [${format.monospace(s.flightNumber)}](${flightAwareUrl(s.flightNumber)})`,
+      `Departure: ${departurePort}`,
       `${departureTime}`,
-      `${departurePort}`,
-      `Arrival: ${format.monospace(s.arrivalIataCode)}`,
-      `${arrivalTime}`,
-      `${arrivalPort}`
+      `Arrival: ${arrivalPort}`,
+      `${arrivalTime}`
     ].join('\n');
   });
 
@@ -119,7 +124,6 @@ function formatFlightTrip(f: FlightTrip) {
 function formatFlightItinery(f: FlightItinery) {
   return f.trips.map(formatFlightTrip).join('\n\n');
 }
-
 
 async function extractFlightItinery(email: ForwardableEmailMessage, env: Env): Promise<FlightItinery> {
   const prompt = PROMPT_EXTRACT_FLIGHT_INFO;
