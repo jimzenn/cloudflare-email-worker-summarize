@@ -139,8 +139,9 @@ async function extractFlightItinery(email: ForwardableEmailMessage, env: Env): P
   const prompt = PROMPT_EXTRACT_FLIGHT_INFO;
   console.log('[Flight] Sending email text to OpenAI:', email.text.substring(0, 200) + '...');
   
+  let response: string;
   try {
-    const response = await queryOpenAI(prompt, email.text, env);
+    response = await queryOpenAI(prompt, email.text, env);
     console.log('[Flight] Raw OpenAI response:', response);
     
     const parsed = JSON.parse(response);
@@ -149,9 +150,12 @@ async function extractFlightItinery(email: ForwardableEmailMessage, env: Env): P
   } catch (error) {
     if (error instanceof SyntaxError) {
       console.error('[Flight] JSON parsing error:', error.message);
-      console.error('[Flight] Invalid OpenAI response:', response);
+      console.error('[Flight] Invalid OpenAI response:', response!);
     } else {
       console.error('[Flight] Unexpected error during flight extraction:', error);
+      if (error instanceof Error) {
+        console.error('[Flight] Error stack:', error.stack);
+      }
     }
     throw error; // Re-throw to maintain existing error handling
   }
