@@ -21,15 +21,21 @@ export default {
 
       const cleanText = removeRepeatedEmptyLines(email.text || '');
       const shortenedText = await replaceWithShortenedUrls(cleanText, env);
+      const userPrompt = [
+        `Subject: ${email.subject}`,
+        `From: ${email.from.name} <${email.from.address}>`,
+        `To: ${email.to.map((to: { name: string, address: string }) => `${to.name} <${to.address}>`).join(', ')}`,
+        shortenedText
+      ].join('\n');
       const summary = await queryOpenAI(
         PROMPT_MARKDOWN_V2_SUMMARIZE,
-        shortenedText,
+        userPrompt,
         env
       );
 
       await Promise.all([
         sendPushoverNotification(email.subject, summary, env),
-        sendTelegramMessage(sender, email.subject, summary,  env),
+        sendTelegramMessage(sender, email.subject, summary, env),
       ]);
 
     } catch (error) {
