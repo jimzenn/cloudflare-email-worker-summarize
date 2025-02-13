@@ -1,39 +1,22 @@
-import PostalMime, { Email } from 'postal-mime';
-import { dispatchToHandler } from './handlerDispatcher';
-import { PROMPT_TRIAGE } from './prompts/triage';
-import { queryOpenAI } from './services/openai';
-import { Env } from './types/env';
-import { TriageResponse as TriageInfo } from './types/triageResponse';
-import { createEmailPrompt } from './utils/email';
+import PostalMime from 'postal-mime';
+import { dispatchToHandler } from '@/dispatch';
+import { Env } from '@/types/env';
+import { triageEmail } from '@/triage';
 
 export default {
   async email(message: ForwardableEmailMessage, env: Env, ctx: ExecutionContext): Promise<void> {
     try {
-      const email:Email = await PostalMime.parse(message.raw);
+      const email = await PostalMime.parse(message.raw);
 
       console.log(`📥 From: ${email.from.address}, Subject: "${email.subject}"`);
 
-      const triageResponse = await queryOpenAI(
-        PROMPT_TRIAGE,
-        await createEmailPrompt(email, env),
-        env
-      );
+      const triageInfo = await triageEmail(email, env);
+      const category = triageInfo.category;
+      const domainKnowledges = triageInfo.domain_knowledge;
 
-      let triageInfo: TriageInfo;
-      try {
-        triageInfo = JSON.parse(triageResponse);
+      console.log(`[Triage] ${email.subject || '(No subject)'} → ${JSON.stringify(triageInfo)}`);
 
-        const category = triageInfo.category;
-        const domainKnowledges = triageInfo.domain_knowledge;
-
-        console.log(`[Triage] ${email.subject || '(No subject)'} → ${JSON.stringify(triageInfo)}`);
-
-        dispatchToHandler(email, category, domainKnowledges, env);
-      } catch (parseError) {
-        console.error('Failed to parse triage response:', triageResponse);
-      }
-
-
+      dispatchToHandler(email, category, domainKnowledges, env);
     } catch (error) {
       console.error('Email processing failed:', error);
       throw error;

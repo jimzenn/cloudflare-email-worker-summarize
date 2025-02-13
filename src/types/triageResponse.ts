@@ -19,7 +19,7 @@ export enum EmailCategory {
   OTHER = "other"
 }
 
-export type TriageResponse = {
+export type TriageInfo = {
   category: EmailCategory;
   domain_knowledge: string[];
 };
