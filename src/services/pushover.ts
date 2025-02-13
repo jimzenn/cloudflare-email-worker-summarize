@@ -1,4 +1,4 @@
-import { Env } from 'types/env';
+import { Env } from '@/types/env';
 
 export async function sendPushoverNotification(title: string, message: string, env: Env): Promise<void> {
     const formData = new URLSearchParams({

@@ -1,4 +1,4 @@
-import { Env } from 'types/env';
+import { Env } from '@/types/env';
 
 const SHORTIO_API_URL = 'https://api.short.io/links';
 const SLUG_HASH_LENGTH = 4;

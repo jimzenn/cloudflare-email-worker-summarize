@@ -1,4 +1,4 @@
-import PostalMime from 'postal-mime';
+import PostalMime, { Email } from 'postal-mime';
 import { dispatchToHandler } from './handlerDispatcher';
 import { PROMPT_TRIAGE } from './prompts/triage';
 import { queryOpenAI } from './services/openai';
@@ -9,7 +9,7 @@ import { createEmailPrompt } from './utils/email';
 export default {
   async email(message: ForwardableEmailMessage, env: Env, ctx: ExecutionContext): Promise<void> {
     try {
-      const email = await PostalMime.parse(message.raw);
+      const email:Email = await PostalMime.parse(message.raw);
 
       console.log(`📥 From: ${email.from.address}, Subject: "${email.subject}"`);
 

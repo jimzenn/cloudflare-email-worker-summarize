@@ -1,12 +1,12 @@
-import { ForwardableEmailMessage } from "postal-mime";
-import { Env } from "./types/env";
-import { FlightHandler } from "./handlers/flight";
-import { queryOpenAI } from "./services/openai";
-import { sendTelegramMessage } from "./services/telegram";
-import { PROMPT_SUMMARIZE_MARKDOWN_V2 } from "./prompts/actions";
-import { createEmailPrompt } from "./utils/email";
+import { Email } from "postal-mime";
+import { FlightHandler } from "@/handlers/flight";
+import { PROMPT_SUMMARIZE_MARKDOWN_V2 } from "@/prompts/actions";
+import { queryOpenAI } from "@/services/openai";
+import { sendTelegramMessage } from "@/services/telegram";
+import { Env } from "@/types/env";
+import { createEmailPrompt } from "@/utils/email";
 
-export async function dispatchToHandler(email: ForwardableEmailMessage, category: string, domainKnowledges: string[], env: Env) {
+export async function dispatchToHandler(email: Email, category: string, domainKnowledges: string[], env: Env) {
   if (category === "flight") {
     const flightHandler = new FlightHandler(email, domainKnowledges, env);
     await flightHandler.handle();
@@ -19,6 +19,6 @@ export async function dispatchToHandler(email: ForwardableEmailMessage, category
       env
     );
 
-    await sendTelegramMessage(sender, email.subject, summary, env);
+    await sendTelegramMessage(sender, email.subject || '(No subject)', summary, env);
   }
 }

@@ -1,4 +1,4 @@
-import { Env } from "../types/env";
+import { Env } from "@/types/env";
 
 export interface ChatMessage {
   role: "system" | "user" | "assistant";
@@ -117,7 +117,7 @@ export async function queryOpenAI(
     return text;
   } catch (error) {
     clearTimeout(timeoutId); // Ensure timeout is cleared on error
-    if (error.name === 'AbortError') {
+    if (error instanceof Error && error.name === 'AbortError') {
       console.error(`[OpenAI | ${model}] Request timed out after ${timeoutMs}ms`);
       throw new Error(`Request timed out after ${timeoutMs}ms`);
     } else {

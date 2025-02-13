@@ -1,4 +1,5 @@
-import { Env } from '../types/env';
+import { Env } from '@/types/env';
+
 import { markdownv2 as format } from 'telegram-format';
 
 const MAX_TELEGRAM_MESSAGE_LENGTH = 4096;
