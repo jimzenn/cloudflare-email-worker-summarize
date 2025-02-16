@@ -7,6 +7,7 @@ import { Env } from "@/types/env";
 import { createEmailPrompt } from "@/utils/email";
 
 export async function dispatchToHandler(email: Email, category: string, domainKnowledges: string[], env: Env) {
+  console.log(`[Dispatcher] Dispatching to handler: ${category}`);
   if (category === "flight") {
     const flightHandler = new FlightHandler(email, domainKnowledges, env);
     await flightHandler.handle();
