@@ -6,12 +6,13 @@ import { Env } from "@/types/env";
 import { TriageInfo } from "@/types/triageResponse";
 
 export async function triageEmail(email: Email, env: Env): Promise<TriageInfo> {
+    const userPrompt = await createEmailPrompt(email, env);
     const triageResponse = await queryOpenAI(
       PROMPT_TRIAGE,
-      await createEmailPrompt(email, env),
+      userPrompt,
       env
     );
-  
+
     try {
       return JSON.parse(triageResponse);
     } catch (parseError) {

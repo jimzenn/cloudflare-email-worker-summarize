@@ -54,6 +54,14 @@ async function makeOpenAIRequest(
 ): Promise<ChatCompletionResponse> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  const startTime = Date.now();
+  
+  console.log(`[🤖OpenAI] Request starting...`);
+  
+  const heartbeatInterval = setInterval(() => {
+    const elapsedTime = Date.now() - startTime;
+    console.log(`[🤖OpenAI] Request in progress... ${elapsedTime/1000}s elapsed`);
+  }, 1000); // Log every 1 seconds
 
   const requestOptions = {
     method: "POST",
@@ -91,7 +99,9 @@ async function makeOpenAIRequest(
     }
     throw new OpenAIError('Request failed', error);
   } finally {
+    clearInterval(heartbeatInterval);
     clearTimeout(timeoutId);
+    console.log(`[🤖OpenAI] Request completed in ${Date.now() - startTime}ms`);
   }
 }
 
@@ -130,7 +140,7 @@ export async function queryOpenAI(
       temperature: 0.7,
     };
 
-    console.log(`[ 🤖 OpenAI | ${model} ] Request:`, JSON.stringify(body));
+    console.log(`[🤖OpenAI|${model}] Request:`, JSON.stringify(body));
 
     const response = await makeOpenAIRequest(
       "https://api.openai.com/v1/chat/completions",
@@ -145,16 +155,16 @@ export async function queryOpenAI(
     }
 
     const result = content.trim();
-    console.log(`[ 🤖 OpenAI | ${model} ] Response: ${result}`);
+    console.log(`[🤖OpenAI|${model}] Response: ${result}`);
     return result;
 
   } catch (error) {
     if (error instanceof OpenAIError) {
-      console.error(`[🤖 OpenAI ] ${error.name}: ${error.message}`);
+      console.error(`[🤖OpenAI] ${error.name}: ${error.message}`);
       throw error;
     }
     // Handle unexpected errors
-    console.error('[🤖 OpenAI ] Unexpected error:', error);
+    console.error('[🤖OpenAI] Unexpected error:', error);
     throw new OpenAIError('Unexpected error occurred', error);
   }
 }
