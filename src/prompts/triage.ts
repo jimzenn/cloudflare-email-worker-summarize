@@ -27,4 +27,5 @@ You will be given one email at a time. and you should respond with a JSON object
   - Product review: "hairdryer specs", "market pricing", and more.
   - Financial: "credit card benefits", "rewards programs", and more.
   - Entertainment: specific show/event name, and more.
+- cleaned_email_body: proofread, cleaned text of the email with proper sentence structure, paragraph breaks, and grammar, without any formatting or html tags.
 `

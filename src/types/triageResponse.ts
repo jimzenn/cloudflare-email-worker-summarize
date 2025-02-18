@@ -22,5 +22,6 @@ export enum EmailCategory {
 export type TriageInfo = {
   category: EmailCategory;
   domain_knowledge: string[];
+  cleaned_email_body: string;
 };
 

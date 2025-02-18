@@ -14,4 +14,3 @@ export async function sendPushoverNotification(title: string, message: string, e
     });
   }
   
-  
