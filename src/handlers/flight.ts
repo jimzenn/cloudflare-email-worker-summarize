@@ -2,7 +2,7 @@ import FlightSchema from "@/schemas/FlightSchema.json";
 import { queryOpenAI } from "@/services/openai";
 import { sendTelegramMessage } from "@/services/telegram";
 import { Env } from "@/types/env";
-import { FlightItinery, FlightTrip } from "@/types/flight";
+import { FlightItinerary, FlightTrip } from "@/types/flight";
 import { formatDateTime, formatDuration } from "@/utils/datetime";
 import { createEmailPrompt } from "@/utils/email";
 import { Email } from "postal-mime";
@@ -64,7 +64,7 @@ function formatFlightTrip(f: FlightTrip) {
   return [header, ...segmentMarkdowns].join('\n');
 }
 
-function formatFlightItinery(f: FlightItinery) {
+function formatFlightItinerary(f: FlightItinerary) {
   return [
     `Passenger: *${f.passengerName}*`,
     ...f.trips.map(formatFlightTrip),
@@ -72,7 +72,7 @@ function formatFlightItinery(f: FlightItinery) {
   ].join('\n\n');
 }
 
-async function extractFlightItinery(email: Email, env: Env): Promise<FlightItinery> {
+async function extractFlightItinerary(email: Email, env: Env): Promise<FlightItinerary> {
   console.log('[Flight] Sending email text to OpenAI:', email.text?.substring(0, 200) + '...');
 
   try {
@@ -85,7 +85,7 @@ async function extractFlightItinery(email: Email, env: Env): Promise<FlightItine
     );
     
     const parsed = JSON.parse(response);
-    console.log('[Flight] Successfully parsed response into FlightItinery');
+    console.log('[Flight] Successfully parsed response into FlightItinerary');
     return parsed;
   } catch (error) {
     if (error instanceof SyntaxError) {
@@ -107,10 +107,10 @@ export class FlightHandler {
   async handle() {
     console.log(`[Flight] Handling ${this.email.subject || '(No subject)'}`);
     try {
-      const flightItinery = await extractFlightItinery(this.email, this.env);
-      console.log('[Flight] Extracted flight itinery:', flightItinery);
-      const message = formatFlightItinery(flightItinery);
-      console.log('[Flight] Formatted flight itinery:', message);
+      const flightItinerary = await extractFlightItinerary(this.email, this.env);
+      console.log('[Flight] Extracted flight itinerary:', flightItinerary);
+      const message = formatFlightItinerary(flightItinerary);
+      console.log('[Flight] Formatted flight itinerary:', message);
       await sendTelegramMessage(this.email.from.address || 'unknown', this.email.subject || '(No subject)', message, this.env);
     } catch (error) {
       console.error('[Flight] Error processing flight:', error);

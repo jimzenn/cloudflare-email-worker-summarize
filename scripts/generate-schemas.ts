@@ -23,7 +23,7 @@ const program = TJS.getProgramFromFiles(
 
 const schemas = {
   "TriageSchema": TJS.generateSchema(program, "TriageInfo", settings),
-  "FlightSchema": TJS.generateSchema(program, "FlightItinery", settings),
+  "FlightSchema": TJS.generateSchema(program, "FlightItinerary", settings),
   "VerificationSchema": TJS.generateSchema(program, "VerificationCode", settings),
 };
 

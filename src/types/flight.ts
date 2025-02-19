@@ -24,7 +24,7 @@ export interface FlightTrip {
   segments: FlightSegment[];
 }
 
-export interface FlightItinery {
+export interface FlightItinerary {
   passengerName: string;
   trips: FlightTrip[];
   additional_notes?: string[];
