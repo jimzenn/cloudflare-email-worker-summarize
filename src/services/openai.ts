@@ -14,6 +14,20 @@ interface ChatCompletionResponse {
   }[];
 }
 
+interface ChatCompletionRequest {
+  model: string;
+  messages: ChatMessage[];
+  temperature?: number;
+  response_format?: {
+    type: "json_schema";
+    json_schema?: {
+      name?: string;
+      schema: object;
+      strict?: boolean;
+    };
+  };
+}
+
 class OpenAIError extends Error {
   constructor(message: string, public readonly cause?: unknown) {
     super(message);
@@ -43,24 +57,20 @@ class OpenAIResponseError extends OpenAIError {
 }
 
 async function makeOpenAIRequest(
-  url: string, 
-  body: {
-    model: string;
-    messages: ChatMessage[];
-    temperature?: number;
-  }, 
-  apiKey: string, 
+  url: string,
+  body: ChatCompletionRequest,
+  apiKey: string,
   timeoutMs: number
 ): Promise<ChatCompletionResponse> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
   const startTime = Date.now();
-  
+
   console.log(`[🤖OpenAI] Request starting...`);
-  
+
   const heartbeatInterval = setInterval(() => {
     const elapsedTime = Date.now() - startTime;
-    console.log(`[🤖OpenAI] Request in progress... ${elapsedTime/1000}s elapsed`);
+    console.log(`[🤖OpenAI] Request in progress... ${elapsedTime / 1000}s elapsed`);
   }, 1000); // Log every 1 seconds
 
   const requestOptions = {
@@ -101,7 +111,7 @@ async function makeOpenAIRequest(
   } finally {
     clearInterval(heartbeatInterval);
     clearTimeout(timeoutId);
-    console.log(`[🤖OpenAI] Request completed in ${Date.now() - startTime}ms`);
+    console.log(`[🤖OpenAI] Request completed in ${((Date.now() - startTime) / 1000).toFixed(2)}s`);
   }
 }
 
@@ -119,7 +129,9 @@ async function makeOpenAIRequest(
 export async function queryOpenAI(
   systemPrompt: string,
   userPrompt: string,
-  env: Env
+  env: Env,
+  schema: object,
+  schemaName: string
 ): Promise<string> {
   try {
     const { OPENAI_API_KEY: apiKey, OPENAI_MODEL: model } = env;
@@ -127,17 +139,22 @@ export async function queryOpenAI(
       throw new OpenAIConfigError("OPENAI_API_KEY is not set");
     }
 
-    const body: {
-      model: string;
-      messages: ChatMessage[];
-      temperature?: number;
-    } = {
+    const body: ChatCompletionRequest = {
       model,
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: userPrompt },
       ],
       temperature: 0.7,
+    };
+
+    body.response_format = {
+      type: "json_schema",
+      json_schema: {
+        name: schemaName,
+        schema,
+        strict: true
+      }
     };
 
     console.log(`[🤖OpenAI|${model}] Request:`, JSON.stringify(body));
@@ -163,7 +180,6 @@ export async function queryOpenAI(
       console.error(`[🤖OpenAI] ${error.name}: ${error.message}`);
       throw error;
     }
-    // Handle unexpected errors
     console.error('[🤖OpenAI] Unexpected error:', error);
     throw new OpenAIError('Unexpected error occurred', error);
   }

@@ -1,16 +1,19 @@
-import { Email } from "postal-mime";
 import { PROMPT_TRIAGE } from "@/prompts/triage";
+import TriageSchema from "@/schemas/TriageSchema.json";
 import { queryOpenAI } from "@/services/openai";
-import { createEmailPrompt } from "@/utils/email";
 import { Env } from "@/types/env";
-import { TriageInfo } from "@/types/triageResponse";
+import { TriageInfo } from "@/types/triage";
+import { createEmailPrompt } from "@/utils/email";
+import { Email } from "postal-mime";
 
 export async function triageEmail(email: Email, env: Env): Promise<TriageInfo> {
     const userPrompt = await createEmailPrompt(email, env);
     const triageResponse = await queryOpenAI(
       PROMPT_TRIAGE,
       userPrompt,
-      env
+      env,
+      TriageSchema,
+      "TriageSchema"
     );
 
     try {

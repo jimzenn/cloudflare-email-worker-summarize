@@ -1,85 +1,20 @@
+import FlightSchema from "@/schemas/FlightSchema.json";
 import { queryOpenAI } from "@/services/openai";
 import { sendTelegramMessage } from "@/services/telegram";
 import { Env } from "@/types/env";
+import { FlightItinery, FlightTrip } from "@/types/flight";
 import { formatDateTime, formatDuration } from "@/utils/datetime";
 import { createEmailPrompt } from "@/utils/email";
-
 import { Email } from "postal-mime";
 import { markdownv2 as format } from 'telegram-format';
 
 export const PROMPT_EXTRACT_FLIGHT_INFO = `
 You are my personal assistant, and you are given an email, help me extract key information.
 
-You should respond directly with a parsable JSON object with the following Typescript interface.
+For each email extract flight information and return it in a structured format.
 
-DO NOT include markdown code block quotes! The JSON response must be directly parsable!!
-
-Here's the Typescript interface:
-
-interface FlightSegment {
-  airlineName: string; // e.g. "Delta Airlines"
-  flightNumber: string; // e.g. "DL1234"
-  seatNumber?: string; // e.g. "12A"
-
-  departureTime: string;  // e.g. "2025-02-13T12:00:00Z"
-  departureTZ?: string; // e.g. "America/Los_Angeles"
-  departureCity: string; // e.g. "Los Angeles"
-  departureIataCode: string; // e.g. "LAX"
-  departureTerminal?: string; // e.g. "1"
-  departureGate?: string; // e.g. "12"
-
-  arrivalTime: string;  // e.g. "2025-02-13T12:00:00Z"
-  arrivalTZ?: string; // e.g. "America/San_Francisco"
-  arrivalCity: string; // e.g. "San Francisco"
-  arrivalIataCode: string; // e.g. "SFO"
-  arrivalTerminal?: string; // e.g. "International"
-  arrivalGate?: string; // e.g. "12"
-}
-
-interface FlightTrip {
-  confirmation_code: string;  // e.g. "H3VTK8"
-  flightClass: string; // e.g. "Economy"
-  segments: FlightSegment[];
-}
-
-interface FlightItinery {
-  passengerName: string; // e.g. "John Doe"
-  trips: FlightTrip[];
-  additional_notes?: string[];
-}
+Ensure your response matches the provided JSON schema structure exactly.
 `
-
-interface FlightSegment {
-  airlineName: string; // e.g. "Delta Airlines"
-  flightNumber: string; // e.g. "DL1234"
-  seatNumber?: string; // e.g. "12A"
-
-  departureTime: string;  // e.g. "2025-02-13T12:00:00Z"
-  departureTZ: string; // e.g. "America/Los_Angeles"
-  departureCity: string; // e.g. "Los Angeles"
-  departureIataCode: string; // e.g. "LAX"
-  departureTerminal?: string; // e.g. "1"
-  departureGate?: string; // e.g. "12"
-
-  arrivalTime: string;  // e.g. "2025-02-13T12:00:00Z"
-  arrivalTZ: string; // e.g. "America/San_Francisco"
-  arrivalCity: string; // e.g. "San Francisco"
-  arrivalIataCode: string; // e.g. "SFO"
-  arrivalTerminal?: string; // e.g. "International"
-  arrivalGate?: string; // e.g. "12"
-}
-
-interface FlightTrip {
-  confirmation_code: string;  // e.g. "H3VTK8"
-  flightClass: string; // e.g. "Economy", "Main Cabin", "First Class"
-  segments: FlightSegment[];
-}
-
-interface FlightItinery {
-  passengerName: string; // e.g. "John Doe"
-  trips: FlightTrip[];
-  additional_notes?: string[];  // e.g. "No checked bags", "Non-refundable", etc.
-}
 
 function flightAwareUrl(flightNumber: string) {
   return `https://flightaware.com/live/flight/${flightNumber}`;
@@ -138,28 +73,30 @@ function formatFlightItinery(f: FlightItinery) {
 }
 
 async function extractFlightItinery(email: Email, env: Env): Promise<FlightItinery> {
-  const prompt = PROMPT_EXTRACT_FLIGHT_INFO;
   console.log('[Flight] Sending email text to OpenAI:', email.text?.substring(0, 200) + '...');
 
-  let response: string;
   try {
-    response = await queryOpenAI(prompt, await createEmailPrompt(email, env), env);
-    console.log('[Flight] Raw OpenAI response:', response);
-
+    const response = await queryOpenAI(
+      PROMPT_EXTRACT_FLIGHT_INFO,
+      await createEmailPrompt(email, env),
+      env,
+      FlightSchema,
+      "FlightSchema"
+    );
+    
     const parsed = JSON.parse(response);
     console.log('[Flight] Successfully parsed response into FlightItinery');
     return parsed;
   } catch (error) {
     if (error instanceof SyntaxError) {
       console.error('[Flight] JSON parsing error:', error.message);
-      console.error('[Flight] Invalid OpenAI response:', response!);
     } else {
       console.error('[Flight] Unexpected error during flight extraction:', error);
       if (error instanceof Error) {
         console.error('[Flight] Error stack:', error.stack);
       }
     }
-    throw error; // Re-throw to maintain existing error handling
+    throw error;
   }
 }
 
@@ -179,5 +116,4 @@ export class FlightHandler {
       console.error('[Flight] Error processing flight:', error);
     }
   }
-
 }
