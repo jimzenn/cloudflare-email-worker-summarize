@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+        "module": "CommonJS",
+        "moduleResolution": "node",
+        "rootDir": "../",
+        "baseUrl": "../",
+        "paths": {
+            "@/*": ["./src/*"]
+        },
+        "types": [
+            "node"
+        ],
+        "esModuleInterop": true,
+        "strict": true,
+        "skipLibCheck": true,
+        "resolveJsonModule": true
+    },
+    "include": [
+        "../src/**/*",
+        "./**/*"
+    ]
+}
