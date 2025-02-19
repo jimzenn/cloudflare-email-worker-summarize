@@ -5,6 +5,7 @@ import * as path from "path";
 const settings: TJS.PartialArgs = {
   required: true,
   ref: false,
+  noExtraProps: true
 };
 
 const compilerOptions: TJS.CompilerOptions = {
