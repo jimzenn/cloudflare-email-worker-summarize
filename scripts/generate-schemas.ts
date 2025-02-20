@@ -6,7 +6,6 @@ const settings: TJS.PartialArgs = {
   required: true,
   ref: false,
   noExtraProps: true,
-  strictNullChecks: true
 };
 
 const compilerOptions: TJS.CompilerOptions = {
