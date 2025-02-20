@@ -5,7 +5,8 @@ import * as path from "path";
 const settings: TJS.PartialArgs = {
   required: true,
   ref: false,
-  noExtraProps: true
+  noExtraProps: true,
+  strictNullChecks: true
 };
 
 const compilerOptions: TJS.CompilerOptions = {
@@ -16,7 +17,8 @@ const program = TJS.getProgramFromFiles(
   [
     path.resolve("src/types/triage.ts"),
     path.resolve("src/types/flight.ts"),
-    path.resolve("src/types/verification.ts")
+    path.resolve("src/types/verification.ts"),
+    path.resolve("src/types/summarize.ts")
   ],
   compilerOptions
 );
@@ -25,6 +27,7 @@ const schemas = {
   "TriageSchema": TJS.generateSchema(program, "TriageInfo", settings),
   "FlightSchema": TJS.generateSchema(program, "FlightItinerary", settings),
   "VerificationSchema": TJS.generateSchema(program, "VerificationCode", settings),
+  "SummarizeSchema": TJS.generateSchema(program, "SummarizeResponse", settings),
 };
 
 const schemasDir = path.resolve("src/schemas");

@@ -1,11 +1,8 @@
 import { Email } from "postal-mime";
 import { FlightHandler } from "@/handlers/flight";
 import { VerificationHandler } from "@/handlers/verification";
-import { PROMPT_SUMMARIZE_MARKDOWN_V2 } from "@/prompts/actions";
-import { queryOpenAI } from "@/services/openai";
-import { sendTelegramMessage } from "@/services/telegram";
 import { Env } from "@/types/env";
-import { createEmailPrompt } from "@/utils/email";
+import { SummarizeHandler } from "./handlers/summarize";
 
 export async function dispatchToHandler(email: Email, category: string, domainKnowledges: string[], env: Env) {
   console.log(`[📨Dispatcher] Dispatching to handler: ${category}`);
@@ -18,14 +15,7 @@ export async function dispatchToHandler(email: Email, category: string, domainKn
     await verificationHandler.handle();
   }
   else {
-    const sender = email.from.address || 'unknown';
-    const userPrompt = await createEmailPrompt(email, env);
-    const summary = await queryOpenAI(
-      PROMPT_SUMMARIZE_MARKDOWN_V2,
-      userPrompt,
-      env
-    );
-
-    await sendTelegramMessage(sender, email.subject || '(No subject)', summary, env);
+    const summarizeHandler = new SummarizeHandler(email, domainKnowledges, env);
+    await summarizeHandler.handle();
   }
 }

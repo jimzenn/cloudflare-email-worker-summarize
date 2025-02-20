@@ -75,15 +75,15 @@ function formatFlightItinerary(f: FlightItinerary) {
 async function extractFlightItinerary(email: Email, env: Env): Promise<FlightItinerary> {
   console.log('[Flight] Sending email text to OpenAI:', email.text?.substring(0, 200) + '...');
 
+  const response = await queryOpenAI(
+    PROMPT_EXTRACT_FLIGHT_INFO,
+    await createEmailPrompt(email, env),
+    env,
+    FlightSchema,
+    "FlightItinerary"
+  );
+
   try {
-    const response = await queryOpenAI(
-      PROMPT_EXTRACT_FLIGHT_INFO,
-      await createEmailPrompt(email, env),
-      env,
-      FlightSchema,
-      "FlightSchema"
-    );
-    
     const parsed = JSON.parse(response);
     console.log('[Flight] Successfully parsed response into FlightItinerary');
     return parsed;

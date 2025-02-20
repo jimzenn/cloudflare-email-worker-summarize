@@ -18,15 +18,15 @@ Ensure your response matches the provided JSON schema structure exactly.
 async function extractVerificationCode(email: Email, env: Env): Promise<VerificationCode> {
   console.log('[Verification] Sending email text to OpenAI:', email.text?.substring(0, 200) + '...');
 
+  const response = await queryOpenAI(
+    PROMPT_EXTRACT_VERIFICATION_CODE,
+    await createEmailPrompt(email, env),
+    env,
+    VerificationSchema,
+    "VerificationCode"
+  );
+
   try {
-    const response = await queryOpenAI(
-      PROMPT_EXTRACT_VERIFICATION_CODE,
-      await createEmailPrompt(email, env),
-      env,
-      VerificationSchema,
-      "VerificationSchema"
-    );
-    
     const parsed = JSON.parse(response);
     console.log('[Verification] Successfully parsed response into VerificationCode');
     return parsed;
@@ -37,7 +37,7 @@ async function extractVerificationCode(email: Email, env: Env): Promise<Verifica
 }
 
 export class VerificationHandler {
-  constructor(private email: Email, private domainKnowledges: string[], private env: Env) {}
+  constructor(private email: Email, private domainKnowledges: string[], private env: Env) { }
 
   async handle() {
     console.log(`[Verification] Handling ${this.email.subject || '(No subject)'}`);
@@ -47,7 +47,7 @@ export class VerificationHandler {
     const code = verificationCode.code;
     const title = `[${service}] ${accountName ? accountName : ''}`;
     const message = `[Verification] ${title} : ${code}`;
-    console.log('[Verification] Sending message to Telegram:', message);    
+    console.log('[Verification] Sending message to Telegram:', message);
     await sendPushoverNotification(title, message, this.env);
     await sendTelegramMessage(this.email.from.address || 'unknown', this.email.subject || '(No subject)', message, this.env);
   }

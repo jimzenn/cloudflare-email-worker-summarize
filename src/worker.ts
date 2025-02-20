@@ -16,10 +16,9 @@ export default {
 
       console.log(`[Triage] ${email.subject || '(No subject)'} → ${JSON.stringify(triageInfo)}`);
 
-      // Replace the email text with the cleaned email body for easier processing
       email.text = triageInfo.cleaned_email_body;
 
-      dispatchToHandler(email, category, domainKnowledges, env);
+      await dispatchToHandler(email, category, domainKnowledges, env);
     } catch (error) {
       console.error('Email processing failed:', error);
       throw error;
