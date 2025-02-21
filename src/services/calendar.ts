@@ -2,7 +2,7 @@ import { CalendarEvent } from '@/types/calendarEvent';
 import { Env } from '@/types/env';
 import { generateJWT } from '@/utils/jwt';
 
-export async function createCalendarEvent(env: Env, event: CalendarEvent) {
+export async function createCalendarEvent(event: CalendarEvent, env: Env) {
 
   const jwt = await generateJWT(JSON.parse(env.GOOGLE_SERVICE_ACCOUNT_JSON_KEY));
 

@@ -17,7 +17,9 @@ const program = TJS.getProgramFromFiles(
     path.resolve("src/types/triage.ts"),
     path.resolve("src/types/flight.ts"),
     path.resolve("src/types/verification.ts"),
-    path.resolve("src/types/summarize.ts")
+    path.resolve("src/types/summarize.ts"),
+    path.resolve("src/types/bill.ts"),
+    path.resolve("src/types/llmResponseCalendarEvent.ts"),
   ],
   compilerOptions
 );
@@ -27,6 +29,8 @@ const schemas = {
   "FlightSchema": TJS.generateSchema(program, "FlightItinerary", settings),
   "VerificationSchema": TJS.generateSchema(program, "VerificationCode", settings),
   "SummarizeSchema": TJS.generateSchema(program, "SummarizeResponse", settings),
+  "BillSchema": TJS.generateSchema(program, "BillInfo", settings),
+  "LlmResponseCalendarEventSchema": TJS.generateSchema(program, "LlmResponseCalendarEvent", settings),
 };
 
 const schemasDir = path.resolve("src/schemas");
