@@ -45,10 +45,11 @@ export class VerificationHandler {
     const service = verificationCode.service;
     const accountName = verificationCode.account_name;
     const code = verificationCode.code;
-    const title = `[${service}] ${accountName ? accountName : ''}`;
-    const message = `[Verification] ${title} : ${code}`;
-    console.log('[Verification] Sending message to Telegram:', message);
-    await sendPushoverNotification(title, message, this.env);
-    await sendTelegramMessage(this.email.from.address || 'unknown', this.email.subject || '(No subject)', message, this.env);
+    const title = `[${service}]` + (accountName ? ` ${accountName}` : '');
+    const message = `*${title}* \`${code}\``;
+    await Promise.all([
+      sendPushoverNotification(title, message, this.env),
+      sendTelegramMessage(this.email.from.address || 'unknown', this.email.subject || '(No subject)', message, this.env)
+    ]);
   }
 }
