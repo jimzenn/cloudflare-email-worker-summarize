@@ -10,7 +10,7 @@ import { Email } from "postal-mime";
 const PROMPT_EXTRACT_VERIFICATION_CODE = `
 You are my personal assistant, and you are given an email related to verification, help me extract key information.
 
-For each email extract verification code information and return it in a structured format.
+For each email extract verification code information and return it in a structured format. If a field is not present, return an empty string.
 
 Ensure your response matches the provided JSON schema structure exactly.
 `;

@@ -1,21 +1,21 @@
 export interface FlightSegment {
   airlineName: string;
   flightNumber: string;
-  seatNumber?: string;
+  seatNumber: string;
 
   departureTime: string;
   departureTZ: string;
   departureCity: string;
   departureIataCode: string;
-  departureTerminal?: string;
-  departureGate?: string;
+  departureTerminal: string;
+  departureGate: string;
 
   arrivalTime: string;
   arrivalTZ: string;
   arrivalCity: string;
   arrivalIataCode: string;
-  arrivalTerminal?: string;
-  arrivalGate?: string;
+  arrivalTerminal: string;
+  arrivalGate: string;
 }
 
 export interface FlightTrip {
@@ -27,5 +27,5 @@ export interface FlightTrip {
 export interface FlightItinerary {
   passengerName: string;
   trips: FlightTrip[];
-  additional_notes?: string[];
+  additional_notes: string[];
 } 
