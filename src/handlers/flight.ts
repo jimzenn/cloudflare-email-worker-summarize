@@ -13,16 +13,25 @@ You are my personal assistant, and you are given an email, help me extract key i
 
 For each email extract flight information and return it in a structured format.
 
-Timezone (i.e. departureTimezone, arrivalTimezone) must be in the format of "America/New_York" or "Asia/Shanghai".
+- Timezone (i.e. departureTimezone, arrivalTimezone) must be in the format of "America/New_York" or "Asia/Shanghai".
+- Ensure all known fields and calculatable fields are included.
+- Include all important unincluded information in the additional_notes field, and make the key information section bold.
 
 Ensure your response matches the provided JSON schema structure exactly.
 `
+
+const DIVIDER = "———————————————————————————";
 
 function flightAwareUrl(flightNumber: string) {
   return `https://flightaware.com/live/flight/${flightNumber}`;
 }
 
-const formatPort = (city: string, iataCode: string, terminal?: string, gate?: string) => {
+const formatPort = (
+  city: string,
+  iataCode: string,
+  terminal?: string,
+  gate?: string
+) => {
   const location = `${format.bold(city)} (${format.monospace(iataCode)})`;
   const details = [terminal, gate].filter(Boolean).join(' ');
   return details ? `${location} | ${details}` : location;
@@ -37,18 +46,17 @@ function formatFlightTrip(f: FlightTrip) {
 
   const header = [
     `${format.bold(departureCity)} ➔ ${format.bold(arrivalCity)}`,
-    `${f.flightClass}`,
-    `Confirmation Code: ${format.bold(format.monospace(f.confirmation_code))}`,
     `${formatDuration(totalDuration)}`,
     `${f.segments.length - 1} layover${f.segments.length - 1 === 1 ? '' : 's'}`,
+    DIVIDER,
   ].join('\n');
 
-  const segmentMarkdowns = f.segments.map((s, index) => {
-    const departureTime = formatDateTime(new Date(s.departureTime), s.departureTimezone); 
+  const segmentMarkdowns = f.segments.flatMap((s, index) => {
+    const departureTime = formatDateTime(new Date(s.departureTime), s.departureTimezone);
     const arrivalTime = formatDateTime(new Date(s.arrivalTime), s.arrivalTimezone);
     const departurePort = formatPort(s.departureCity, s.departureIataCode, s.departureTerminal, s.departureGate);
     const arrivalPort = formatPort(s.arrivalCity, s.arrivalIataCode, s.arrivalTerminal, s.arrivalGate);
-    const segment = [
+    const segmentLines = [
       `${format.bold(s.airlineName)} \- [${s.flightNumber}](${flightAwareUrl(s.flightNumber)})`,
       `${departurePort} ➔ ${arrivalPort}`,
       `${departureTime} \- ${arrivalTime}`
@@ -57,21 +65,30 @@ function formatFlightTrip(f: FlightTrip) {
     if (index < f.segments.length - 1) {
       const nextSegment = f.segments[index + 1];
       const layoverDuration = new Date(nextSegment.departureTime).getTime() - new Date(s.arrivalTime).getTime();
-      segment.push(`\n${format.italic(`Layover in ${s.arrivalCity}: ${formatDuration(layoverDuration)}`)}`);
+      segmentLines.push('', `${format.italic(`Layover in ${s.arrivalCity}: ${formatDuration(layoverDuration)}`)}`, '');
     }
 
-    return segment;
+    return segmentLines;
   });
 
   return [header, ...segmentMarkdowns].join('\n');
 }
 
 function formatFlightItinerary(f: FlightItinerary) {
-  return [
-    `Passenger: *${f.passengerName}*`,
-    ...f.trips.map(formatFlightTrip),
-    ...(f.additional_notes ? [`*Additional Notes:* ${f.additional_notes.join(', ')}`] : []),
-  ].join('\n\n');
+  const header = [
+    `Passenger: ${format.bold(f.passengerName)}`,
+    `${format.italic(f.trips[0].flightClass)}`,
+    `Confirmation Code: ${format.bold(format.monospace(f.trips[0].confirmation_code))}`,
+    ''
+  ];
+
+  const trips = f.trips.map(formatFlightTrip);
+
+  const notes = f.additional_notes
+    ? [DIVIDER, format.bold('Additional Notes:'), ...f.additional_notes.map(note => `- ${note}`)]
+    : [];
+
+  return [...header, ...trips, ...notes].join('\n');
 }
 
 async function extractFlightItinerary(email: Email, env: Env): Promise<FlightItinerary> {
@@ -111,8 +128,11 @@ export class FlightHandler {
     const flightItinerary = await extractFlightItinerary(this.email, this.env);
     try {
       const message = formatFlightItinerary(flightItinerary);
+      const departureCity = flightItinerary.trips[0].segments[0].departureCity;
+      const arrivalCity = flightItinerary.trips[0].segments[flightItinerary.trips[0].segments.length - 1].arrivalCity;
+      const title = `✈️ ${flightItinerary.passengerName}: ${departureCity} ➔ ${arrivalCity}`;
       console.log('[Flight] Formatted flight itinerary:', message);
-      await sendTelegramMessage(this.email.from.address || 'unknown', this.email.subject || '(No subject)', message, this.env);
+      await sendTelegramMessage(this.email.from.address || 'unknown', title, message, this.env);
     } catch (error) {
       console.error('[Flight] Error processing flight:', error);
       throw error;
