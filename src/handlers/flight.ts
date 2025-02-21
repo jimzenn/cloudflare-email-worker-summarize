@@ -44,8 +44,8 @@ function formatFlightTrip(f: FlightTrip) {
   ].join('\n');
 
   const segmentMarkdowns = f.segments.map((s, index) => {
-    const departureTime = formatDateTime(new Date(s.departureTime), s.departureTZ);
-    const arrivalTime = formatDateTime(new Date(s.arrivalTime), s.arrivalTZ);
+    const departureTime = formatDateTime(new Date(s.departureTime), s.departureTimezone); 
+    const arrivalTime = formatDateTime(new Date(s.arrivalTime), s.arrivalTimezone);
     const departurePort = formatPort(s.departureCity, s.departureIataCode, s.departureTerminal, s.departureGate);
     const arrivalPort = formatPort(s.arrivalCity, s.arrivalIataCode, s.arrivalTerminal, s.arrivalGate);
     const segment = [
@@ -112,10 +112,10 @@ export class FlightHandler {
     try {
       const message = formatFlightItinerary(flightItinerary);
       console.log('[Flight] Formatted flight itinerary:', message);
+      await sendTelegramMessage(this.email.from.address || 'unknown', this.email.subject || '(No subject)', message, this.env);
     } catch (error) {
       console.error('[Flight] Error processing flight:', error);
+      throw error;
     }
-
-    await sendTelegramMessage(this.email.from.address || 'unknown', this.email.subject || '(No subject)', message, this.env);
   }
 }
