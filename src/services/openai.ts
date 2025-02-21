@@ -71,7 +71,7 @@ async function makeOpenAIRequest(
   const heartbeatInterval = setInterval(() => {
     const elapsedTime = Date.now() - startTime;
     console.log(`[🤖OpenAI] Request in progress... ${elapsedTime / 1000}s elapsed`);
-  }, 1000); // Log every 1 seconds
+  }, 5000); // Log every 5 seconds
 
   const requestOptions = {
     method: "POST",
@@ -163,7 +163,7 @@ export async function queryOpenAI(
       "https://api.openai.com/v1/chat/completions",
       body,
       apiKey,
-      10000
+      60000
     );
 
     const content = response.choices?.[0]?.message?.content;
