@@ -17,7 +17,7 @@ For each email, provide:
   - "transportation" (other transportation, e.g. bus, ferry, helicopter, etc.)
   - "experience" (e.g. movie, show, musical, concert, etc.)
   - "event" (e.g. medical appointment, doctor appointment, meeting, etc.)
-  - "transaction" (e.g. upcoming payment, payment, purchase, invoice, receipt, bill, etc.)
+  - "bill" (e.g. upcoming payment, payment, purchase, invoice, receipt, bill, etc.)
   - "promotion" (e.g. promotion offer, discount, etc.)
   - "policy_change" (e.g. terms of service, privacy policy, etc.)
   - "verification" (e.g. verification code, etc.)

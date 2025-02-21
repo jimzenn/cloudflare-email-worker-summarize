@@ -40,7 +40,13 @@ const DIVIDER = "—————————————————————
 
 async function extractBillInfo(email: Email, domainKnowledges: string[], env: Env): Promise<BillInfo> {
   const prompt = PROMPT_EXTRACT_BILL_INFO;
-  const response = await queryOpenAI(prompt, await createEmailPrompt(email, env), env, BillSchema, "BillInfo");
+  const response = await queryOpenAI(
+    prompt, 
+    await createEmailPrompt(email, env), 
+    env, 
+    BillSchema,
+    "BillInfo"
+  );
   const billInfo: BillInfo = JSON.parse(response);
   return billInfo;
 }
@@ -64,10 +70,6 @@ export class BillHandler {
 
     const billInfo = await extractBillInfo(this.email, this.domainKnowledges, this.env);
 
-    if (billInfo.calendar_event) {
-      await createCalendarEvent(billInfo.calendar_event, this.env);
-    }
-
     const title = `💸 ${billInfo.to_whom}: ${billInfo.what_for}`;
     const message = [
       format.bold(billInfo.bill_status),
@@ -77,8 +79,13 @@ export class BillHandler {
       DIVIDER,
       format.bold('Additional Notes:'),
       ...billInfo.additional_notes.map(note => `- ${note}`),
+      `Reminder added to the Calendar.`
     ].join('\n');
 
     await sendTelegramMessage(this.email.from.address || 'unknown', title, message, this.env);
+
+    if (billInfo.calendar_event) {
+      await createCalendarEvent(billInfo.calendar_event, this.env);
+    }
   }
 }

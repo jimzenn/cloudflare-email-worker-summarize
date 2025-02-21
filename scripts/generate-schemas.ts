@@ -19,7 +19,7 @@ const program = TJS.getProgramFromFiles(
     path.resolve("src/types/verification.ts"),
     path.resolve("src/types/summarize.ts"),
     path.resolve("src/types/bill.ts"),
-    path.resolve("src/types/llmResponseCalendarEvent.ts"),
+    path.resolve("src/types/basicCalendarEvent.ts"),
   ],
   compilerOptions
 );
@@ -30,7 +30,7 @@ const schemas = {
   "VerificationSchema": TJS.generateSchema(program, "VerificationCode", settings),
   "SummarizeSchema": TJS.generateSchema(program, "SummarizeResponse", settings),
   "BillSchema": TJS.generateSchema(program, "BillInfo", settings),
-  "LlmResponseCalendarEventSchema": TJS.generateSchema(program, "LlmResponseCalendarEvent", settings),
+  "BasicCalendarEventSchema": TJS.generateSchema(program, "BasicCalendarEvent", settings),
 };
 
 const schemasDir = path.resolve("src/schemas");

@@ -13,7 +13,7 @@ export async function triageEmail(email: Email, env: Env): Promise<TriageInfo> {
       userPrompt,
       env,
       TriageSchema,
-      "TriageSchema"
+      "TriageInfo"
     );
 
     try {
