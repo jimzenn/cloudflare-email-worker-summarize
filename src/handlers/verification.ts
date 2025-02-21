@@ -12,8 +12,7 @@ You are my personal assistant, and you are given an email related to verificatio
 
 For each email extract verification code information and return it in a structured format. If a field is not present, return an empty string.
 
-Ensure your response matches the provided JSON schema structure exactly.
-`;
+Ensure your response matches the provided JSON schema structure exactly.`;
 
 async function extractVerificationCode(email: Email, env: Env): Promise<VerificationCode> {
   console.log('[Verification] Sending email text to OpenAI:', email.text?.substring(0, 200) + '...');

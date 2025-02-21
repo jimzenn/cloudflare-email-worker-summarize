@@ -4,14 +4,14 @@ export interface FlightSegment {
   seatNumber: string;
 
   departureTime: string;
-  departureTZ: string;
+  departureTimezone: string;
   departureCity: string;
   departureIataCode: string;
   departureTerminal: string;
   departureGate: string;
 
   arrivalTime: string;
-  arrivalTZ: string;
+  arrivalTimezone: string;
   arrivalCity: string;
   arrivalIataCode: string;
   arrivalTerminal: string;

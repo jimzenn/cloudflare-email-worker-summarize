@@ -13,6 +13,8 @@ You are my personal assistant, and you are given an email, help me extract key i
 
 For each email extract flight information and return it in a structured format.
 
+Timezone (i.e. departureTimezone, arrivalTimezone) must be in the format of "America/New_York" or "Asia/Shanghai".
+
 Ensure your response matches the provided JSON schema structure exactly.
 `
 
@@ -106,14 +108,14 @@ export class FlightHandler {
 
   async handle() {
     console.log(`[Flight] Handling ${this.email.subject || '(No subject)'}`);
+    const flightItinerary = await extractFlightItinerary(this.email, this.env);
     try {
-      const flightItinerary = await extractFlightItinerary(this.email, this.env);
-      console.log('[Flight] Extracted flight itinerary:', flightItinerary);
       const message = formatFlightItinerary(flightItinerary);
       console.log('[Flight] Formatted flight itinerary:', message);
-      await sendTelegramMessage(this.email.from.address || 'unknown', this.email.subject || '(No subject)', message, this.env);
     } catch (error) {
       console.error('[Flight] Error processing flight:', error);
     }
+
+    await sendTelegramMessage(this.email.from.address || 'unknown', this.email.subject || '(No subject)', message, this.env);
   }
 }
