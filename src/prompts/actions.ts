@@ -28,6 +28,7 @@ Then,
 - If it is a payment / transaction / flight / hotel / etc.: give me the details in a concise format, short bullet points.
 - If it is an event / ticket / etc.: include bullet points for: name, date, time, location, and other details.
 - Locations must have a Markdown link to Google Maps like http://maps.google.com/?q=location+name .
+- Summarize it in its original language.
 
 Formatting Example:
 
