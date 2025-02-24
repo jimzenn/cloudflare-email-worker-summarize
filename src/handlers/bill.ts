@@ -1,6 +1,6 @@
 import { queryOpenAI } from "@/services/openai";
 import { Env } from "@/types/env";
-import { createEmailPrompt } from "@/utils/email";
+import { createEmailPrompt, fullSender } from "@/utils/email";
 import { Email } from "postal-mime";
 import BillSchema from "@/schemas/BillSchema.json";
 import { createCalendarEvent } from "@/services/calendar";
@@ -82,7 +82,7 @@ export class BillHandler {
       `Reminder added to the Calendar.`
     ].join('\n');
 
-    await sendTelegramMessage(this.email.from.address || 'unknown', title, message, this.env);
+    await sendTelegramMessage(fullSender(this.email), title, message, this.env);
 
     if (billInfo.calendar_event) {
       await createCalendarEvent(billInfo.calendar_event, this.env);

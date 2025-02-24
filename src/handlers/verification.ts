@@ -4,7 +4,7 @@ import { sendPushoverNotification } from "@/services/pushover";
 import { sendTelegramMessage } from "@/services/telegram";
 import { Env } from "@/types/env";
 import { VerificationCode } from "@/types/verification";
-import { createEmailPrompt } from "@/utils/email";
+import { createEmailPrompt, fullSender } from "@/utils/email";
 import { Email } from "postal-mime";
 
 const PROMPT_EXTRACT_VERIFICATION_CODE = `
@@ -48,7 +48,7 @@ export class VerificationHandler {
     const message = `*${title}* \`${code}\``;
     await Promise.all([
       sendPushoverNotification(title, message, this.env),
-      sendTelegramMessage(this.email.from.address || 'unknown', title, message, this.env)
+      sendTelegramMessage(fullSender(this.email), title, message, this.env)
     ]);
   }
 }

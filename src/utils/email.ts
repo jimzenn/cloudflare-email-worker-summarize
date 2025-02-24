@@ -19,3 +19,7 @@ export async function createEmailPrompt(email: Email, env: Env): Promise<string>
 
   return userPrompt;
 }
+
+export function fullSender(email: Email): string {
+  return `${email.from.name} <${email.from.address}>`;
+}

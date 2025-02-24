@@ -4,7 +4,7 @@ import { sendTelegramMessage } from "@/services/telegram";
 import { Env } from "@/types/env";
 import { FlightItinerary, FlightTrip } from "@/types/flight";
 import { formatDateTime, formatDuration } from "@/utils/datetime";
-import { createEmailPrompt } from "@/utils/email";
+import { createEmailPrompt, fullSender } from "@/utils/email";
 import { Email } from "postal-mime";
 import { markdownv2 as format } from 'telegram-format';
 
@@ -132,7 +132,7 @@ export class FlightHandler {
       const arrivalCity = flightItinerary.trips[0].segments[flightItinerary.trips[0].segments.length - 1].arrivalCity;
       const title = `✈️ ${flightItinerary.passengerName}: ${departureCity} ➔ ${arrivalCity}`;
       console.log('[Flight] Formatted flight itinerary:', message);
-      await sendTelegramMessage(this.email.from.address || 'unknown', title, message, this.env);
+      await sendTelegramMessage(fullSender(this.email), title, message, this.env);
     } catch (error) {
       console.error('[Flight] Error processing flight:', error);
       throw error;
