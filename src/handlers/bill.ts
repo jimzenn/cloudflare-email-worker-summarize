@@ -16,6 +16,7 @@ bill status should be one of the following:
 - paid
 - failed
 - refunded
+- requested (venmo, zelle, etc.)
 
 - bill account should be the account name that the bill is for, it could be an ID, my name, or an account number or email.
 - If the bill account has multiple value: name, email, ID, format it as "name (email, ID)".
