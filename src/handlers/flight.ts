@@ -127,28 +127,28 @@ function createFlightCalendarEvent(segment: FlightSegment, passengerName: string
   const arrivalTime = new Date(segment.arrivalTime);
 
   const description = [
-    `Passenger: ${passengerName}`,
-    `Seat: ${segment.seatNumber}`,
+    `Passenger: <b>${passengerName}</b>`,
+    `Seat: <b>${segment.seatNumber}</b>`,
     '',
-    `Departure:`,
+    `<b>Departure</b>`,
     `• Time: ${formatDateTime(departureTime, segment.departureTimezone)}`,
     `• City: ${segment.departureCity}`,
     `• Terminal: ${segment.departureTerminal}`,
     `• Gate: ${segment.departureGate}`,
     '',
-    `Arrival:`,
+    `<b>Arrival</b>`,
     `• Time: ${formatDateTime(arrivalTime, segment.arrivalTimezone)}`,
     `• City: ${segment.arrivalCity}`,
     `• Terminal: ${segment.arrivalTerminal}`,
     `• Gate: ${segment.arrivalGate}`,
     '',
-    `Flight tracking: ${flightAwareUrl(segment.flightNumber)}`
+    `<a href="${flightAwareUrl(segment.flightNumber)}">Flight tracking for ${segment.flightNumber}</a>`
   ].join('\n');
 
   return {
     summary: `${segment.departureCity} (${segment.departureIataCode}) ➔ ${segment.arrivalCity} (${segment.arrivalIataCode})`,
     description,
-    location: `https://maps.google.com/?q=${encodeURIComponent(`${segment.departureCity} ${segment.departureIataCode} ${segment.departureTerminal}`)}`,
+    location: `${segment.departureIataCode} Airport, Terminal ${segment.departureTerminal}`,
     start: {
       dateTime: segment.departureTime,
       timeZone: segment.departureTimezone,
