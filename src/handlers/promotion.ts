@@ -6,6 +6,7 @@ import { Env } from "@/types/env";
 import { PromotionDetails } from "@/types/promotion";
 import { createEmailPrompt, fullSender } from "@/utils/email";
 import { Email } from "postal-mime";
+import { formatPromotionMessage } from "@/formatters/promotion";
 
 const PROMPT_ANALYZE_PROMOTION = `
 Analyze the promotional email and extract key information.
@@ -60,17 +61,13 @@ export class PromotionHandler {
     private env: Env
   ) {}
 
+
   async handle() {
     console.log(`[Promotion] Handling ${this.email.subject || '(No subject)'}`);
     const analysis = await analyzePromotion(this.email, this.domainKnowledges, this.env);
     
-    const title = `💰 ${analysis.promotionType}: ${analysis.vendor}`;
-    const verdict = analysis.recommendation === "RECOMMENDED" ? "✅" : 
-                   analysis.recommendation === "NOT_RECOMMENDED" ? "❌" : "⚖️";
-    
-    const message = `*${title}*\n\n` +
-      `${analysis.items.map(item => `• ${item}`).join('\n')}\n\n` +
-      `*Verdict:* ${verdict} ${analysis.verdict}`;
+    const title = `💰 Promotion from ${analysis.vendor}`;
+    const message = formatPromotionMessage(analysis, title);
 
     await Promise.all([
       sendPushoverNotification(title, message, this.env),

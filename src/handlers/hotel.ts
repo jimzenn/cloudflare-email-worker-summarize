@@ -4,9 +4,8 @@ import { sendTelegramMessage } from "@/services/telegram";
 import { Env } from "@/types/env";
 import { HotelStay } from "@/types/hotel";
 import { createEmailPrompt, fullSender } from "@/utils/email";
-import { currencySymbol } from "@/utils/currency";
 import { Email } from "postal-mime";
-import { markdownv2 as format } from 'telegram-format';
+import { formatHotelStay } from "@/formatters/hotel";
 
 export const PROMPT_EXTRACT_HOTEL_INFO = `
 You are my personal assistant, and you are given an email, help me extract key information about hotel bookings.
@@ -23,41 +22,6 @@ For each email extract hotel stay information and return it in a structured form
 Ensure your response matches the provided JSON schema structure exactly.
 `;
 
-const DIVIDER = "—————————————————————";
-
-function formatHotelStay(stay: HotelStay) {
-  const header = [
-    `${format.bold(stay.hotelName)}`,
-    `Confirmation: ${format.monospace(stay.confirmationCode)}`,
-    `Guest: ${format.bold(stay.guestName)} (${stay.numberOfGuests} guests)`,
-    '',
-    `${format.bold('Room:')} ${stay.roomType}`,
-    `${format.bold('Check-in:')} ${stay.checkInDate} ${stay.checkInTime}`,
-    `${format.bold('Check-out:')} ${stay.checkOutDate} ${stay.checkOutTime}`,
-    '',
-    `${format.bold('Address:')} [${stay.address}](https://maps.google.com/?q=${encodeURIComponent(stay.address)})`,
-    `${format.bold('Total:')} ${currencySymbol(stay.currency)} ${stay.totalAmount}`,
-    ''
-  ];
-
-  if (stay.cancellationPolicy) {
-    header.push(
-      format.bold('Cancellation Policy:'),
-      stay.cancellationPolicy,
-      ''
-    );
-  }
-
-  const notes = stay.additionalNotes?.length > 0
-    ? [
-        DIVIDER,
-        format.bold('Additional Notes:'),
-        ...stay.additionalNotes.map(note => `• ${note}`)
-      ]
-    : [];
-
-  return [...header, ...notes].join('\n');
-}
 
 async function extractHotelStay(email: Email, env: Env): Promise<HotelStay> {
   console.log('[Hotel] Sending email text to OpenAI:', email.text?.substring(0, 200) + '...');
@@ -88,7 +52,7 @@ async function extractHotelStay(email: Email, env: Env): Promise<HotelStay> {
 }
 
 export class HotelHandler {
-  constructor(private email: Email, private domainKnowledges: string[], private env: Env) {}
+  constructor(private email: Email, private domainKnowledges: string[], private env: Env) { }
 
   async handle() {
     console.log(`[Hotel] Handling ${this.email.subject || '(No subject)'}`);

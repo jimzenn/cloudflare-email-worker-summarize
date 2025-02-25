@@ -1,13 +1,12 @@
+import { formatBillMessage } from "@/formatters/bill";
+import BillSchema from "@/schemas/BillSchema.json";
+import { createCalendarEvent } from "@/services/calendar";
 import { queryOpenAI } from "@/services/openai";
+import { sendTelegramMessage } from "@/services/telegram";
+import { BillInfo } from "@/types/bill";
 import { Env } from "@/types/env";
 import { createEmailPrompt, fullSender } from "@/utils/email";
 import { Email } from "postal-mime";
-import BillSchema from "@/schemas/BillSchema.json";
-import { createCalendarEvent } from "@/services/calendar";
-import { BillInfo } from "@/types/bill";
-import { sendTelegramMessage } from "@/services/telegram";
-import { markdownv2 as format } from 'telegram-format';
-import { currencySymbol } from "@/utils/currency";
 
 const PROMPT_EXTRACT_BILL_INFO = `
 You are my personal assistant, and you are given an email related to bill, help me extract key information.
@@ -38,8 +37,6 @@ The calendar event fields follows that of Google Calendar API v3.
 
 Ensure your response matches the provided JSON schema structure exactly.`;
 
-const DIVIDER = "—————————————————————";
-
 async function extractBillInfo(email: Email, domainKnowledges: string[], env: Env): Promise<BillInfo> {
   const prompt = PROMPT_EXTRACT_BILL_INFO;
   const response = await queryOpenAI(
@@ -60,18 +57,7 @@ export class BillHandler {
     console.log(`[Bill] Handling ${this.email.subject || '(No subject)'}`);
 
     const billInfo = await extractBillInfo(this.email, this.domainKnowledges, this.env);
-
-    const title = `💸 ${billInfo.to_whom}: ${billInfo.what_for}`;
-    const message = [
-      format.bold(billInfo.bill_status),
-      billInfo.bill_date,
-      format.monospace(billInfo.bill_account),
-      `${currencySymbol(billInfo.bill_currency)}${billInfo.bill_amount}`,
-      DIVIDER,
-      format.bold('Additional Notes:'),
-      ...billInfo.additional_notes.map(note => `- ${note}`),
-      `Reminder added to the Calendar.`
-    ].join('\n');
+    const { title, message } = formatBillMessage(billInfo);
 
     await sendTelegramMessage(fullSender(this.email), title, message, this.env);
 
