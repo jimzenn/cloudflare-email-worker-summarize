@@ -7,6 +7,7 @@ import { createCalendarEvent } from "@/services/calendar";
 import { BillInfo } from "@/types/bill";
 import { sendTelegramMessage } from "@/services/telegram";
 import { markdownv2 as format } from 'telegram-format';
+import { currencySymbol } from "@/utils/currency";
 
 const PROMPT_EXTRACT_BILL_INFO = `
 You are my personal assistant, and you are given an email related to bill, help me extract key information.
@@ -50,17 +51,6 @@ async function extractBillInfo(email: Email, domainKnowledges: string[], env: En
   );
   const billInfo: BillInfo = JSON.parse(response);
   return billInfo;
-}
-
-
-function currencySymbol(currency: string) {
-  switch (currency) {
-    case "USD": return "$";
-    case "CNY": return "¥";
-    case "EUR": return "€";
-    case "GBP": return "£";
-    default: return currency;
-  }
 }
 
 export class BillHandler {

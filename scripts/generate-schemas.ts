@@ -19,6 +19,7 @@ const program = TJS.getProgramFromFiles(
     path.resolve("src/types/verification.ts"),
     path.resolve("src/types/summarize.ts"),
     path.resolve("src/types/bill.ts"),
+    path.resolve("src/types/hotel.ts"),
     path.resolve("src/types/basicCalendarEvent.ts"),
   ],
   compilerOptions
@@ -31,6 +32,7 @@ const schemas = {
   "SummarizeSchema": TJS.generateSchema(program, "SummarizeResponse", settings),
   "BillSchema": TJS.generateSchema(program, "BillInfo", settings),
   "BasicCalendarEventSchema": TJS.generateSchema(program, "BasicCalendarEvent", settings),
+  "HotelSchema": TJS.generateSchema(program, "HotelStay", settings),
 };
 
 const schemasDir = path.resolve("src/schemas");

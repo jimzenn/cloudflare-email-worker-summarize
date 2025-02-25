@@ -4,6 +4,7 @@ import { VerificationHandler } from "@/handlers/verification";
 import { Env } from "@/types/env";
 import { SummarizeHandler } from "./handlers/summarize";
 import { BillHandler } from "./handlers/bill";
+import { HotelHandler } from "@/handlers/hotel";
 
 export async function dispatchToHandler(email: Email, category: string, domainKnowledges: string[], env: Env) {
   console.log(`[📨Dispatcher] Dispatching to handler: ${category}`);
@@ -18,6 +19,10 @@ export async function dispatchToHandler(email: Email, category: string, domainKn
   else if (category === "verification") {
     const verificationHandler = new VerificationHandler(email, domainKnowledges, env);
     await verificationHandler.handle();
+  }
+  else if (category === "hotel") {
+    const hotelHandler = new HotelHandler(email, domainKnowledges, env);
+    await hotelHandler.handle();
   }
   else {
     const summarizeHandler = new SummarizeHandler(email, domainKnowledges, env);

@@ -128,6 +128,10 @@ async function resolveUrlToFinal(url: string): Promise<string> {
 }
 
 export async function replaceWithShortenedUrls(text: string, env: Env): Promise<string> {
+  if (!env.ENABLE_LINK_SHORTENING) {
+    return text;
+  }
+
   const urls = extractUrls(text);
   const finalUrls = new Set<string>();
 
