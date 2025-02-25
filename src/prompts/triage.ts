@@ -34,7 +34,7 @@ For each email, provide:
   - Product review: "hairdryer specs", "market pricing", and more.
   - Financial: "credit card benefits", "rewards programs", and more.
   - Entertainment: specific show/event name, and more.
-- cleaned_email_body: proofread, cleaned text of the email with proper sentence structure, paragraph breaks, and grammar, without any formatting or html tags.
+- cleaned_email_body: proofread, cleaned text of the email with proper sentence structure, paragraph breaks, and grammar, without any formatting or html tags. KEEP ALL THE ORIGINAL INFORMATION! ONLY IMPROVE GRAMMAR, REMOVE FORMATTING AND HTML TAGS. IT'S OK TO BE VERBOSE or VERBATIM!
 
 Ensure your response matches the provided JSON schema structure exactly.
 `
