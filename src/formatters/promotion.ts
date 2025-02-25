@@ -14,7 +14,7 @@ function formatPromotionItem(item: PromotionDetails['items'][0]): string {
 
 
   return [
-    format.bold(item.promotedItem),
+    '◎ ' + format.bold(item.promotedItem),
     '',
     formatList(item.deal),
     '',
