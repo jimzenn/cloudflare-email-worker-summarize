@@ -131,10 +131,12 @@ export async function queryOpenAI(
   userPrompt: string,
   env: Env,
   schema: object,
-  schemaName: string
+  schemaName: string,
+  model: string = env.OPENAI_MODEL
 ): Promise<string> {
+
   try {
-    const { OPENAI_API_KEY: apiKey, OPENAI_MODEL: model } = env;
+    const { OPENAI_API_KEY: apiKey } = env;
     if (!apiKey) {
       throw new OpenAIConfigError("OPENAI_API_KEY is not set");
     }

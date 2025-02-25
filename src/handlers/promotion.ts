@@ -25,6 +25,7 @@ Analyze the promotional email and extract key information.
     - "~$100~$80/year (-$20/year)" (i.e. $100/year before deal, $80/year after deal).
     - Always convert recurring price to yearly price. For example, "~$10~$8/month (-$2/month)" should be "~$120~$96/year (-$24/year, billed annually)".
     - If the deal is a percentage off, e.g. "10% off", "20% off", etc., the deal should be formatted as "~$100~$90 (-$10)".
+    - It could be also a more complex deal, e.g. "Deposit $30k & maintain 45 days, get $1000 bonus (beats x.x% APY which yields $xxx over 45 days, which means you gain $xxx compared to the market rate)".
     - If there are multiple types of deals, format them as a list. For example, montly rate and annual rate.
     - If there is no deal or no price, return an empty string.
 - The pros and cons are not descriptions of the deal, but rather, you should be a financial advisor and shopping assistant, and decide whether the deal is good or not based on the features, user reviews, and the deal itself. e.g.
@@ -71,7 +72,8 @@ async function analyzePromotion(
     contextEnhancedPrompt,
     env,
     PromotionSchema,
-    "PromotionDetails"
+    "PromotionDetails",
+    "o3-mini",
   );
 
   try {
