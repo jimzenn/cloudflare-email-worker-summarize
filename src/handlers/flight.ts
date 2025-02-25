@@ -58,8 +58,9 @@ function formatFlightTrip(f: FlightTrip) {
     const arrivalTime = formatDateTime(new Date(s.arrivalTime), s.arrivalTimezone);
     const departurePort = formatPort(s.departureCity, s.departureIataCode, s.departureTerminal, s.departureGate);
     const arrivalPort = formatPort(s.arrivalCity, s.arrivalIataCode, s.arrivalTerminal, s.arrivalGate);
+    const flightNumberWithLink = format.url(s.flightNumber, flightAwareUrl(s.flightNumber));
     const segmentLines = [
-      `${format.bold(s.airlineName)} \- [${s.flightNumber}](${flightAwareUrl(s.flightNumber)})`,
+      `${format.bold(s.airlineName)}${flightNumberWithLink ? ` \- ${flightNumberWithLink}` : ''}`,
       `${departurePort} ➔ ${arrivalPort}`,
       `${departureTime} \- ${arrivalTime}`
     ];
@@ -193,12 +194,12 @@ export class FlightHandler {
       const arrivalCity = flightItinerary.trips[0].segments[flightItinerary.trips[0].segments.length - 1].arrivalCity;
       const title = `✈️ ${flightItinerary.passengerName}: ${departureCity} ➔ ${arrivalCity}`;
       console.log('[Flight] Formatted flight itinerary:', message);
-      
+
       await Promise.all([
         sendTelegramMessage(fullSender(this.email), title, message, this.env),
         addFlightToCalendar(flightItinerary, this.env)
       ]);
-      
+
       console.log('[Flight] Added flight segments to calendar');
     } catch (error) {
       console.error('[Flight] Error processing flight:', error);
