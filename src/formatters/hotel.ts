@@ -13,7 +13,7 @@ export function formatHotelStay(stay: HotelStay) {
     `${format.bold('Check-in:')} ${stay.checkInDate} ${stay.checkInTime}`,
     `${format.bold('Check-out:')} ${stay.checkOutDate} ${stay.checkOutTime}`,
     '',
-    `${format.bold('Address:')} [${stay.address}](https://maps.google.com/?q=${encodeURIComponent(stay.address)})`,
+    format.bold('Address: ') + format.url(stay.address, `https://maps.google.com/?q=${encodeURIComponent(stay.address)}`),
     `${format.bold('Total:')} ${currencySymbol(stay.currency)} ${stay.totalAmount}`,
     ''
   ];
@@ -28,10 +28,10 @@ export function formatHotelStay(stay: HotelStay) {
 
   const notes = stay.additionalNotes?.length > 0
     ? [
-        DIVIDER,
-        format.bold('Additional Notes:'),
-        ...stay.additionalNotes.map(note => `• ${note}`)
-      ]
+      DIVIDER,
+      format.bold('Additional Notes:'),
+      ...stay.additionalNotes.map(note => `• ${note}`)
+    ]
     : [];
 
   return [...header, ...notes].join('\n');
