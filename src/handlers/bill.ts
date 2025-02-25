@@ -1,11 +1,11 @@
 import { formatBillMessage } from "@/formatters/bill";
 import BillSchema from "@/schemas/BillSchema.json";
 import { createCalendarEvent } from "@/services/calendar";
-import { queryOpenAI } from "@/services/openai";
 import { sendTelegramMessage } from "@/services/telegram";
 import { BillInfo } from "@/types/bill";
 import { Env } from "@/types/env";
-import { createEmailPrompt, fullSender } from "@/utils/email";
+import { fullSender } from "@/utils/email";
+import { extractInformation } from "@/utils/extract";
 import { Email } from "postal-mime";
 
 const PROMPT_EXTRACT_BILL_INFO = `
@@ -37,26 +37,13 @@ The calendar event fields follows that of Google Calendar API v3.
 
 Ensure your response matches the provided JSON schema structure exactly.`;
 
-async function extractBillInfo(email: Email, domainKnowledges: string[], env: Env): Promise<BillInfo> {
-  const prompt = PROMPT_EXTRACT_BILL_INFO;
-  const response = await queryOpenAI(
-    prompt, 
-    await createEmailPrompt(email, env), 
-    env, 
-    BillSchema,
-    "BillInfo"
-  );
-  const billInfo: BillInfo = JSON.parse(response);
-  return billInfo;
-}
-
 export class BillHandler {
   constructor(private email: Email, private domainKnowledges: string[], private env: Env) { }
 
   async handle() {
     console.log(`[Bill] Handling ${this.email.subject || '(No subject)'}`);
 
-    const billInfo = await extractBillInfo(this.email, this.domainKnowledges, this.env);
+    const billInfo: BillInfo = await extractInformation(this.email, PROMPT_EXTRACT_BILL_INFO, BillSchema, "BillInfo", this.env);
     const { title, message } = formatBillMessage(billInfo);
 
     await sendTelegramMessage(fullSender(this.email), title, message, this.env);

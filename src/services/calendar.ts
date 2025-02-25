@@ -1,6 +1,6 @@
 import { CalendarEvent } from '@/types/calendarEvent';
 import { Env } from '@/types/env';
-import { getGoogleAccessToken } from '@/utils/googleOAuth';
+import { getGoogleAccessToken } from '@/services/googleOAuth';
 
 export async function createCalendarEvent(event: CalendarEvent, env: Env) {
   try {

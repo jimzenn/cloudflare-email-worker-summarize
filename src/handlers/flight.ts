@@ -1,12 +1,12 @@
 import { formatFlightCalendarEvent, formatFlightItinerary } from "@/formatters/flight";
 import FlightSchema from "@/schemas/FlightSchema.json";
 import { createCalendarEvent } from "@/services/calendar";
-import { queryOpenAI } from "@/services/openai";
 import { sendTelegramMessage } from "@/services/telegram";
 import { CalendarEvent } from "@/types/calendarEvent";
 import { Env } from "@/types/env";
 import { FlightItinerary, FlightSegment } from "@/types/flight";
-import { createEmailPrompt, fullSender } from "@/utils/email";
+import { fullSender } from "@/utils/email";
+import { extractInformation } from "@/utils/extract";
 import { Email } from "postal-mime";
 
 export const PROMPT_EXTRACT_FLIGHT_INFO = `
@@ -23,34 +23,6 @@ For each email extract flight information and return it in a structured format.
 Ensure your response matches the provided JSON schema structure exactly.
 `;
 
-
-async function extractFlightItinerary(email: Email, env: Env): Promise<FlightItinerary> {
-  console.log('[Flight] Sending email text to OpenAI:', email.text?.substring(0, 200) + '...');
-
-  const response = await queryOpenAI(
-    PROMPT_EXTRACT_FLIGHT_INFO,
-    await createEmailPrompt(email, env),
-    env,
-    FlightSchema,
-    "FlightItinerary"
-  );
-
-  try {
-    const parsed = JSON.parse(response);
-    console.log('[Flight] Successfully parsed response into FlightItinerary');
-    return parsed;
-  } catch (error) {
-    if (error instanceof SyntaxError) {
-      console.error('[Flight] JSON parsing error:', error.message);
-    } else {
-      console.error('[Flight] Unexpected error during flight extraction:', error);
-      if (error instanceof Error) {
-        console.error('[Flight] Error stack:', error.stack);
-      }
-    }
-    throw error;
-  }
-}
 
 function createFlightCalendarEvent(segment: FlightSegment, passengerName: string): CalendarEvent {
   return formatFlightCalendarEvent(segment, passengerName);
@@ -75,7 +47,7 @@ export class FlightHandler {
 
   async handle() {
     console.log(`[Flight] Handling ${this.email.subject || '(No subject)'}`);
-    const flightItinerary = await extractFlightItinerary(this.email, this.env);
+    const flightItinerary: FlightItinerary = await extractInformation(this.email, PROMPT_EXTRACT_FLIGHT_INFO, FlightSchema, "FlightItinerary", this.env);
     try {
       const message = formatFlightItinerary(flightItinerary);
       const departureCity = flightItinerary.trips[0].segments[0].departureCity;
