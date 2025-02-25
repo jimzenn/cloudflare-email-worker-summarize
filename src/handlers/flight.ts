@@ -18,6 +18,7 @@ For each email extract flight information and return it in a structured format.
 - Timezone (i.e. departureTimezone, arrivalTimezone) must be in the format of "America/New_York" or "Asia/Shanghai".
 - Ensure all known fields and calculatable fields are included.
 - Include all important unincluded information in the additional_notes field, and make the key information section bold.
+- If a field is not present, return an empty string.
 
 Ensure your response matches the provided JSON schema structure exactly.
 `
@@ -128,22 +129,22 @@ function createFlightCalendarEvent(segment: FlightSegment, passengerName: string
 
   const description = [
     `Passenger: <b>${passengerName}</b>`,
-    `Seat: <b>${segment.seatNumber}</b>`,
+    segment.seatNumber && `Seat: <b>${segment.seatNumber}</b>`,
     '',
     `<b>Departure</b>`,
     `• Time: ${formatDateTime(departureTime, segment.departureTimezone)}`,
     `• City: ${segment.departureCity}`,
-    `• Terminal: ${segment.departureTerminal}`,
-    `• Gate: ${segment.departureGate}`,
+    segment.departureTerminal && `• Terminal: ${segment.departureTerminal}`,
+    segment.departureGate && `• Gate: ${segment.departureGate}`,
     '',
     `<b>Arrival</b>`,
     `• Time: ${formatDateTime(arrivalTime, segment.arrivalTimezone)}`,
     `• City: ${segment.arrivalCity}`,
-    `• Terminal: ${segment.arrivalTerminal}`,
-    `• Gate: ${segment.arrivalGate}`,
+    segment.arrivalTerminal && `• Terminal: ${segment.arrivalTerminal}`,
+    segment.arrivalGate && `• Gate: ${segment.arrivalGate}`,
     '',
     `<a href="${flightAwareUrl(segment.flightNumber)}">Flight tracking for ${segment.flightNumber}</a>`
-  ].join('\n');
+  ].filter(Boolean).join('\n');
 
   return {
     summary: `${segment.departureCity} (${segment.departureIataCode}) ➔ ${segment.arrivalCity} (${segment.arrivalIataCode})`,
