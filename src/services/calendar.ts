@@ -1,11 +1,11 @@
 import { CalendarEvent } from '@/types/calendarEvent';
 import { Env } from '@/types/env';
-import { generateJWT } from '@/utils/jwt';
+import { getGoogleAccessToken } from '@/utils/googleOAuth';
 
 export async function createCalendarEvent(event: CalendarEvent, env: Env) {
   try {
-    console.log('Generating JWT for calendar event creation...');
-    const jwt = await generateJWT(JSON.parse(env.GOOGLE_SERVICE_ACCOUNT_JSON_KEY));
+    console.log('Getting Google access token...');
+    const accessToken = await getGoogleAccessToken(JSON.parse(env.GOOGLE_SERVICE_ACCOUNT_JSON_KEY));
 
     console.log('Sending request to Google Calendar API...', {
       eventSummary: event.summary,
@@ -18,7 +18,7 @@ export async function createCalendarEvent(event: CalendarEvent, env: Env) {
       {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${jwt}`,
+          'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(event),
