@@ -143,7 +143,7 @@ function createFlightCalendarEvent(segment: FlightSegment, passengerName: string
     segment.arrivalTerminal && `• Terminal: ${segment.arrivalTerminal}`,
     segment.arrivalGate && `• Gate: ${segment.arrivalGate}`,
     '',
-    `<a href="${flightAwareUrl(segment.flightNumber)}">Flight tracking for ${segment.flightNumber}</a>`
+    segment.flightNumber && `<a href="${flightAwareUrl(segment.flightNumber)}">Flight tracking for ${segment.flightNumber}</a>`
   ].filter(Boolean).join('\n');
 
   return {
