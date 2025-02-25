@@ -1,9 +1,11 @@
 export interface PromotionItem {
   promotedItem: string;
-  promotionTerms: string[];
+  itemDescription: string;
+  deal: string[];
   pros: string[];
   cons: string[];
-  recommendation: "RECOMMENDED" | "NEUTRAL" | "NOT_RECOMMENDED";
+  thoughts: string[];
+  verdict: string;
 }
 
 export interface PromotionDetails {

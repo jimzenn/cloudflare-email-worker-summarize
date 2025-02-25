@@ -3,27 +3,24 @@ import { markdownv2 as format } from 'telegram-format';
 import { formatList, DIVIDER } from "@/formatters/common";
 function formatPromotionItem(item: PromotionDetails['items'][0]): string {
   return [
-    `*${item.promotedItem}*`,
+    format.bold(item.promotedItem),
     '',
-    item.promotionTerms
-      .map(term => `• ${term}`)
-      .join('\n'),
+    formatList(item.deal),
     '',
     format.bold('Pros'),
-    item.pros
-      .map(pro => `${format.bold('✓')} ${pro}`)
-      .join('\n'),
+    formatList(item.pros, '✓'),
     '',
     format.bold('Cons'),
-    item.cons
-      .map(con => `${format.bold('✗')} ${con}`)
-      .join('\n'),
+    formatList(item.cons, '✗'),
     '',
-    `*Verdict* ${format.bold(item.recommendation)}`
+    format.bold('Thoughts'),
+    formatList(item.thoughts),
+    '',
+    `*Verdict* ${format.bold(item.verdict)}`
   ].join('\n');
 }
 
-export function formatPromotionMessage(analysis: PromotionDetails, title: string): string {
+export function formatPromotionMessage(analysis: PromotionDetails): string {
   const formattedItems = analysis.items.map(formatPromotionItem).join('\n');
 
   const generalTermsSection = analysis.generalTerms.length
@@ -35,8 +32,6 @@ export function formatPromotionMessage(analysis: PromotionDetails, title: string
     : '';
 
   return [
-    `*${title}*`,
-    DIVIDER,
     formattedItems,
     DIVIDER,
     generalTermsSection,
