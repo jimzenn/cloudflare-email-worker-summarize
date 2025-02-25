@@ -2,6 +2,17 @@ import { PromotionDetails } from "@/types/promotion";
 import { markdownv2 as format } from 'telegram-format';
 import { formatList, DIVIDER } from "@/formatters/common";
 function formatPromotionItem(item: PromotionDetails['items'][0]): string {
+
+  let verdict = item.verdict;
+  if (item.verdict === 'NOT_RECOMMENDED') {
+    verdict = '✗ ' + verdict;
+  } else if (item.verdict === 'RECOMMENDED') {
+    verdict = '✓ ' + verdict;
+  } else {
+    verdict = '⍻ ' + verdict;
+  }
+
+
   return [
     format.bold(item.promotedItem),
     '',
@@ -16,7 +27,7 @@ function formatPromotionItem(item: PromotionDetails['items'][0]): string {
     format.bold('Thoughts'),
     formatList(item.thoughts),
     '',
-    `*Verdict* ${format.bold(item.verdict)}`
+    `*Verdict:* ${format.bold(verdict)}`
   ].join('\n');
 }
 
