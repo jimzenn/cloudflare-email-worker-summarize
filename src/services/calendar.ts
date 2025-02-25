@@ -28,11 +28,7 @@ export async function createCalendarEvent(event: CalendarEvent, env: Env) {
     const data = await response.json();
 
     if (!response.ok) {
-      console.error('Failed to create calendar event:', {
-        status: response.status,
-        statusText: response.statusText,
-        error: data,
-      });
+      console.error('Failed to create calendar event:', data);
       throw new Error(`Failed to create calendar event: ${response.statusText}`);
     }
 
@@ -43,7 +39,11 @@ export async function createCalendarEvent(event: CalendarEvent, env: Env) {
 
     return data;
   } catch (error) {
-    console.error('Error in createCalendarEvent:', error);
+    console.error('Error in createCalendarEvent:', {
+      error,
+      message: error.message,
+      stack: error.stack,
+    });
     throw error;
   }
 }
