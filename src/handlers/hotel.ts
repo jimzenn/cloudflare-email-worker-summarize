@@ -23,7 +23,7 @@ For each email extract hotel stay information and return it in a structured form
 Ensure your response matches the provided JSON schema structure exactly.
 `;
 
-const DIVIDER = "———————————————————————————";
+const DIVIDER = "—————————————————————";
 
 function formatHotelStay(stay: HotelStay) {
   const header = [

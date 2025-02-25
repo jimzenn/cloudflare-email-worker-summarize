@@ -38,7 +38,7 @@ The calendar event fields follows that of Google Calendar API v3.
 
 Ensure your response matches the provided JSON schema structure exactly.`;
 
-const DIVIDER = "———————————————————————————";
+const DIVIDER = "—————————————————————";
 
 async function extractBillInfo(email: Email, domainKnowledges: string[], env: Env): Promise<BillInfo> {
   const prompt = PROMPT_EXTRACT_BILL_INFO;
