@@ -6,6 +6,7 @@ import { VerificationCode } from "@/types/verification";
 import { fullSender } from "@/utils/email";
 import { extractInformation } from "@/utils/extract";
 import { Email } from "postal-mime";
+import { Handler } from "@/types/handler";
 
 const PROMPT_EXTRACT_VERIFICATION_CODE = `
 You are my personal assistant, and you are given an email related to verification, help me extract key information.
@@ -14,7 +15,7 @@ For each email extract verification code information and return it in a structur
 
 Ensure your response matches the provided JSON schema structure exactly.`;
 
-export class VerificationHandler {
+export class VerificationHandler implements Handler {
   constructor(private email: Email, private domainKnowledges: string[], private env: Env) { }
 
   async handle() {

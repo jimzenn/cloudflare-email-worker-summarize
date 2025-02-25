@@ -5,8 +5,9 @@ import { queryOpenAI } from "@/services/openai";
 import { createEmailPrompt, fullSender } from "@/utils/email";
 import { sendTelegramMessage } from "@/services/telegram";
 import SummarizeSchema from "@/schemas/SummarizeSchema.json";
+import { Handler } from "@/types/handler";
 
-export class SummarizeHandler {
+export class SummarizeHandler implements Handler {
   constructor(private email: Email, private domainKnowledges: string[], private env: Env) { }
 
   async handle() {

@@ -2,6 +2,7 @@ import { formatHotelStay } from "@/formatters/hotel";
 import HotelSchema from "@/schemas/HotelSchema.json";
 import { sendTelegramMessage } from "@/services/telegram";
 import { Env } from "@/types/env";
+import { Handler } from "@/types/handler";
 import { HotelStay } from "@/types/hotel";
 import { fullSender } from "@/utils/email";
 import { extractInformation } from "@/utils/extract";
@@ -24,7 +25,7 @@ Ensure your response matches the provided JSON schema structure exactly.
 
 
 
-export class HotelHandler {
+export class HotelHandler implements Handler {
   constructor(private email: Email, private domainKnowledges: string[], private env: Env) { }
 
   async handle() {

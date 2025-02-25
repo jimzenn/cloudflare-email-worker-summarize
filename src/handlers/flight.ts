@@ -5,6 +5,7 @@ import { sendTelegramMessage } from "@/services/telegram";
 import { CalendarEvent } from "@/types/calendarEvent";
 import { Env } from "@/types/env";
 import { FlightItinerary, FlightSegment } from "@/types/flight";
+import { Handler } from "@/types/handler";
 import { fullSender } from "@/utils/email";
 import { extractInformation } from "@/utils/extract";
 import { Email } from "postal-mime";
@@ -41,7 +42,7 @@ async function addFlightToCalendar(flightItinerary: FlightItinerary, env: Env) {
   await Promise.all(calendarPromises);
 }
 
-export class FlightHandler {
+export class FlightHandler implements Handler {
   constructor(private email: Email, private domainKnowledges: string[], private env: Env) {
   }
 

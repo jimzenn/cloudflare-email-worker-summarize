@@ -7,6 +7,7 @@ import { PromotionDetails } from "@/types/promotion";
 import { createEmailPrompt, fullSender } from "@/utils/email";
 import { Email } from "postal-mime";
 import { formatPromotionMessage } from "@/formatters/promotion";
+import { Handler } from "@/types/handler";
 
 const PROMPT_ANALYZE_PROMOTION = `
 Analyze the promotional email and extract key information.
@@ -54,7 +55,7 @@ async function analyzePromotion(
   }
 }
 
-export class PromotionHandler {
+export class PromotionHandler implements Handler{
   constructor(
     private email: Email,
     private domainKnowledges: string[],

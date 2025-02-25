@@ -4,6 +4,7 @@ import { createCalendarEvent } from "@/services/calendar";
 import { sendTelegramMessage } from "@/services/telegram";
 import { BillInfo } from "@/types/bill";
 import { Env } from "@/types/env";
+import { Handler } from "@/types/handler";
 import { fullSender } from "@/utils/email";
 import { extractInformation } from "@/utils/extract";
 import { Email } from "postal-mime";
@@ -37,7 +38,7 @@ The calendar event fields follows that of Google Calendar API v3.
 
 Ensure your response matches the provided JSON schema structure exactly.`;
 
-export class BillHandler {
+export class BillHandler implements Handler {
   constructor(private email: Email, private domainKnowledges: string[], private env: Env) { }
 
   async handle() {
