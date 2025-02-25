@@ -60,7 +60,7 @@ function formatFlightTrip(f: FlightTrip) {
     const arrivalPort = formatPort(s.arrivalCity, s.arrivalIataCode, s.arrivalTerminal, s.arrivalGate);
     const flightNumberWithLink = format.url(s.flightNumber, flightAwareUrl(s.flightNumber));
     const segmentLines = [
-      `${format.bold(s.airlineName)}${flightNumberWithLink ? ` \- ${flightNumberWithLink}` : ''}`,
+      `${format.bold(s.airlineName)}${s.flightNumber ? ` \- ${flightNumberWithLink}` : ''}`,
       `${departurePort} ➔ ${arrivalPort}`,
       `${departureTime} \- ${arrivalTime}`
     ];
@@ -126,7 +126,6 @@ function createFlightCalendarEvent(segment: FlightSegment, passengerName: string
   const departureTime = new Date(segment.departureTime);
   const arrivalTime = new Date(segment.arrivalTime);
 
-  const title = `✈️ ${segment.airlineName} ${segment.flightNumber}`;
   const description = [
     `Passenger: ${passengerName}`,
     `Seat: ${segment.seatNumber}`,
