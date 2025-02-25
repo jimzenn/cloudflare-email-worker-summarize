@@ -48,11 +48,11 @@ function formatHotelStay(stay: HotelStay) {
     );
   }
 
-  const notes = stay.additional_notes?.length > 0
+  const notes = stay.additionalNotes?.length > 0
     ? [
         DIVIDER,
         format.bold('Additional Notes:'),
-        ...stay.additional_notes.map(note => `• ${note}`)
+        ...stay.additionalNotes.map(note => `• ${note}`)
       ]
     : [];
 

@@ -12,11 +12,11 @@ export default {
 
       const triageInfo = await triageEmail(email, env);
       const category = triageInfo.category;
-      const domainKnowledges = triageInfo.domain_knowledge;
+      const domainKnowledges = triageInfo.domainKnowledge;
 
       console.log(`[Triage] ${email.subject || '(No subject)'} → ${JSON.stringify(triageInfo)}`);
 
-      email.text = triageInfo.cleaned_email_body;
+      email.text = triageInfo.cleaneEmailBody;
 
       await dispatchToHandler(email, category, domainKnowledges, env);
     } catch (error) {

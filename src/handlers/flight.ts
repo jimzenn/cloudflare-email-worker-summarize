@@ -84,8 +84,8 @@ function formatFlightItinerary(f: FlightItinerary) {
 
   const trips = f.trips.map(formatFlightTrip);
 
-  const notes = f.additional_notes
-    ? [DIVIDER, format.bold('Additional Notes:'), ...f.additional_notes.map(note => `- ${note}`)]
+  const notes = f.additionalNotes
+    ? [DIVIDER, format.bold('Additional Notes:'), ...f.additionalNotes.map(note => `- ${note}`)]
     : [];
 
   return [...header, ...trips, ...notes].join('\n');

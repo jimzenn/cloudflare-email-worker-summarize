@@ -13,5 +13,5 @@ export interface HotelStay {
   totalAmount: number;
   currency: string;
   cancellationPolicy: string;
-  additional_notes: string[];
+  additionalNotes: string[];
 }

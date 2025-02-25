@@ -42,7 +42,7 @@ export class VerificationHandler {
     console.log(`[Verification] Handling ${this.email.subject || '(No subject)'}`);
     const verificationCode = await extractVerificationCode(this.email, this.env);
     const service = verificationCode.service;
-    const accountName = verificationCode.account_name;
+    const accountName = verificationCode.accountName;
     const code = verificationCode.code;
     const title = `🔑 ${service}` + (accountName ? `: ${accountName}` : '');
     const message = `*${title}* \`${code}\``;
