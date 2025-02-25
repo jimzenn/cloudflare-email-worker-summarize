@@ -14,7 +14,7 @@ export async function createCalendarEvent(event: CalendarEvent, env: Env) {
     });
 
     const response = await fetch(
-      `https://www.googleapis.com/calendar/v3/calendars/primary/events`,
+      `https://www.googleapis.com/calendar/v3/calendars/${env.GOOGLE_CALENDAR_ID}/events`,
       {
         method: 'POST',
         headers: {

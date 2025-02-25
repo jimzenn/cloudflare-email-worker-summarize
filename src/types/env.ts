@@ -11,5 +11,6 @@ export interface Env {
     OPENAI_MODEL: string;
     ENABLE_LINK_SHORTENING: boolean;
     GOOGLE_SERVICE_ACCOUNT_JSON_KEY: string;
+    GOOGLE_CALENDAR_ID: string;
   }
   
