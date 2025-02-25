@@ -21,7 +21,7 @@ function formatPromotionItem(item: PromotionDetails['items'][0]): string {
 }
 
 export function formatPromotionMessage(analysis: PromotionDetails): string {
-  const formattedItems = analysis.items.map(formatPromotionItem).join('\n');
+  const formattedItems = analysis.items.map(formatPromotionItem).join(`\n${DIVIDER}\n`);
 
   const generalTermsSection = analysis.generalTerms.length
     ? `*General Terms*\n${formatList(analysis.generalTerms)}`
