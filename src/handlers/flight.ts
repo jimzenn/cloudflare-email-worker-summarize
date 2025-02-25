@@ -1,8 +1,10 @@
 import FlightSchema from "@/schemas/FlightSchema.json";
+import { createCalendarEvent } from "@/services/calendar";
 import { queryOpenAI } from "@/services/openai";
 import { sendTelegramMessage } from "@/services/telegram";
+import { CalendarEvent } from "@/types/calendarEvent";
 import { Env } from "@/types/env";
-import { FlightItinerary, FlightTrip } from "@/types/flight";
+import { FlightItinerary, FlightSegment, FlightTrip } from "@/types/flight";
 import { formatDateTime, formatDuration } from "@/utils/datetime";
 import { createEmailPrompt, fullSender } from "@/utils/email";
 import { Email } from "postal-mime";
@@ -119,6 +121,65 @@ async function extractFlightItinerary(email: Email, env: Env): Promise<FlightIti
   }
 }
 
+function createFlightCalendarEvent(segment: FlightSegment, passengerName: string): CalendarEvent {
+  const departureTime = new Date(segment.departureTime);
+  const arrivalTime = new Date(segment.arrivalTime);
+
+  const title = `✈️ ${segment.airlineName} ${segment.flightNumber}`;
+  const description = [
+    `Passenger: ${passengerName}`,
+    `Seat: ${segment.seatNumber}`,
+    '',
+    `Departure:`,
+    `• Time: ${formatDateTime(departureTime, segment.departureTimezone)}`,
+    `• City: ${segment.departureCity}`,
+    `• Terminal: ${segment.departureTerminal}`,
+    `• Gate: ${segment.departureGate}`,
+    '',
+    `Arrival:`,
+    `• Time: ${formatDateTime(arrivalTime, segment.arrivalTimezone)}`,
+    `• City: ${segment.arrivalCity}`,
+    `• Terminal: ${segment.arrivalTerminal}`,
+    `• Gate: ${segment.arrivalGate}`,
+    '',
+    `Flight tracking: ${flightAwareUrl(segment.flightNumber)}`
+  ].join('\n');
+
+  return {
+    summary: `${segment.departureCity} (${segment.departureIataCode}) ➔ ${segment.arrivalCity} (${segment.arrivalIataCode})`,
+    description,
+    location: `https://maps.google.com/?q=${encodeURIComponent(`${segment.departureCity} ${segment.departureIataCode} ${segment.departureTerminal}`)}`,
+    start: {
+      dateTime: segment.departureTime,
+      timeZone: segment.departureTimezone,
+    },
+    end: {
+      dateTime: segment.arrivalTime,
+      timeZone: segment.arrivalTimezone,
+    },
+    reminders: {
+      useDefault: false,
+      overrides: [
+        { method: 'popup', minutes: 180 }, // 3 hours before
+        { method: 'popup', minutes: 120 }, // 2 hours before
+      ]
+    }
+  };
+}
+
+async function addFlightToCalendar(flightItinerary: FlightItinerary, env: Env) {
+  const calendarPromises = flightItinerary.trips.flatMap(trip =>
+    trip.segments.map(segment =>
+      createCalendarEvent(
+        createFlightCalendarEvent(segment, flightItinerary.passengerName),
+        env
+      )
+    )
+  );
+
+  await Promise.all(calendarPromises);
+}
+
 export class FlightHandler {
   constructor(private email: Email, private domainKnowledges: string[], private env: Env) {
   }
@@ -132,7 +193,13 @@ export class FlightHandler {
       const arrivalCity = flightItinerary.trips[0].segments[flightItinerary.trips[0].segments.length - 1].arrivalCity;
       const title = `✈️ ${flightItinerary.passengerName}: ${departureCity} ➔ ${arrivalCity}`;
       console.log('[Flight] Formatted flight itinerary:', message);
-      await sendTelegramMessage(fullSender(this.email), title, message, this.env);
+      
+      await Promise.all([
+        sendTelegramMessage(fullSender(this.email), title, message, this.env),
+        addFlightToCalendar(flightItinerary, this.env)
+      ]);
+      
+      console.log('[Flight] Added flight segments to calendar');
     } catch (error) {
       console.error('[Flight] Error processing flight:', error);
       throw error;
