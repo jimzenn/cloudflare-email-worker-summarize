@@ -16,5 +16,8 @@ export interface Env {
     GEMINI_API_KEY: string;
     GEMINI_MODEL: string;
     GEMINI_REASONING_MODEL: string;
+    DEEPSEEK_API_KEY: string;
+    DEEPSEEK_MODEL: string;
+    DEEPSEEK_REASONING_MODEL: string;
   }
   

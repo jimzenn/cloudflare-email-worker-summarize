@@ -1,5 +1,6 @@
 import { queryOpenAI } from '@/services/openai';
 import { queryGemini } from '@/services/gemini';
+import { queryDeepSeek } from '@/services/deepseek';
 import { Env } from '@/types/env';
 
 export class LLMError extends Error {
@@ -64,13 +65,15 @@ export async function queryLLM(
   schema: object,
   schemaName: string,
   reasoning: boolean = false,
-  provider: 'openai' | 'gemini' = 'openai',
+  provider: 'openai' | 'gemini' | 'deepseek' = 'openai',
   temperature: number = 0.7,
 ): Promise<string> {
   if (provider === 'openai') {
     return queryOpenAI(systemPrompt, userPrompt, env, schema, schemaName, reasoning, temperature);
   } else if (provider === 'gemini') {
     return queryGemini(systemPrompt, userPrompt, env, schema, schemaName, reasoning, temperature);
+  } else if (provider === 'deepseek') {
+    return queryDeepSeek(systemPrompt, userPrompt, env, schema, schemaName, reasoning, temperature);
   } else {
     throw new Error(`Unsupported provider: ${provider}`);
   }
