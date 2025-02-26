@@ -8,10 +8,14 @@ PUSHOVER_API_URL = "https://api.pushover.net/1/messages.json"
 TELEGRAM_TO_CHAT_ID = "-4706038643"
 SHORTIO_DOMAIN = "link.zenn.in"
 EMAIL_ALLOWLIST = "jimzenn0@gmail.com,*@zenn.in,cplusherly@gmail.com"
-OPENAI_MODEL = "gpt-4o-2024-08-06"
-OPENAI_REASONING_MODEL = "o1-2024-12-17"
 ENABLE_LINK_SHORTENING = true
 GOOGLE_CALENDAR_ID = "c_1cdf51574bb6ac183721c99fae8dc7deba72c48fe0e0c7e892f26b6c974cd15c@group.calendar.google.com"
+
+OPENAI_MODEL = "gpt-4o-2024-08-06"
+OPENAI_REASONING_MODEL = "o1-2024-12-17"
+
+GEMINI_MODEL = "gemini-2.0-flash-lite"
+GEMINI_REASONING_MODEL = "gemini-2.0-pro-exp-02-05"
 
 [observability.logs]
 enabled = true

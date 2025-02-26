@@ -1,6 +1,7 @@
 import { Env } from "@/types/env";
+import { LLMError, makeAPIRequest } from "@/services/llm";
 
-export type ChatRole = "system" | "user" | "assistant";
+type ChatRole = "system" | "user" | "assistant";
 
 export interface ChatMessage {
   role: ChatRole;
@@ -62,17 +63,6 @@ async function makeOpenAIRequest(
   apiKey: string,
   timeoutMs: number
 ): Promise<ChatCompletionResponse> {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-  const startTime = Date.now();
-
-  console.log(`[🤖OpenAI] Request starting...`);
-
-  const heartbeatInterval = setInterval(() => {
-    const elapsedTime = Date.now() - startTime;
-    console.log(`[🤖OpenAI] Request in progress... ${elapsedTime / 1000}s elapsed`);
-  }, 5000); // Log every 5 seconds
-
   const requestOptions = {
     method: "POST",
     headers: {
@@ -80,38 +70,15 @@ async function makeOpenAIRequest(
       "Authorization": `Bearer ${apiKey}`,
     },
     body: JSON.stringify(body),
-    signal: controller.signal,
   };
 
   try {
-    let response: Response;
-    try {
-      response = await fetch(url, requestOptions);
-    } catch (error) {
-      if (error instanceof Error && error.name === 'AbortError') {
-        throw new OpenAITimeoutError(timeoutMs);
-      }
-      throw error;
-    }
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new OpenAIResponseError(
-        `API returned ${response.status}: ${errorText}`,
-        response.status
-      );
-    }
-
-    return await response.json();
+    return await makeAPIRequest<ChatCompletionResponse>("OpenAI", url, requestOptions, timeoutMs);
   } catch (error) {
-    if (error instanceof OpenAIError) {
-      throw error;
+    if (error instanceof LLMError) {
+      throw new OpenAIError(error.message, error.cause);
     }
     throw new OpenAIError('Request failed', error);
-  } finally {
-    clearInterval(heartbeatInterval);
-    clearTimeout(timeoutId);
-    console.log(`[🤖OpenAI] Request completed in ${((Date.now() - startTime) / 1000).toFixed(2)}s`);
   }
 }
 
@@ -121,7 +88,8 @@ async function makeOpenAIRequest(
  * Environment Variables:
  * - OPENAI_API_KEY: Your OpenAI API key.
  * - OPENAI_MODEL: The model to use.
- *
+ * - OPENAI_REASONING_MODEL: The reasoning model to use
+ * 
  * @param systemPrompt - The system-level prompt that sets the context.
  * @param userPrompt - The user's query or prompt.
  * @returns The assistant's response as a string.
@@ -133,6 +101,7 @@ export async function queryOpenAI(
   schema: object,
   schemaName: string,
   reasoning: boolean = false,
+  temperature: number = 0,
 ): Promise<string> {
 
   try {
@@ -148,7 +117,7 @@ export async function queryOpenAI(
         { role: "system", content: systemPrompt },
         { role: "user", content: userPrompt },
       ],
-      temperature: 0.7,
+      temperature: temperature,
     };
 
     body.response_format = {

@@ -13,5 +13,8 @@ export interface Env {
     GOOGLE_SERVICE_ACCOUNT_JSON_KEY: string;
     GOOGLE_CALENDAR_ID: string;
     OPENAI_REASONING_MODEL: string;
+    GEMINI_API_KEY: string;
+    GEMINI_MODEL: string;
+    GEMINI_REASONING_MODEL: string;
   }
   
