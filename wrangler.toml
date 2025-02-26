@@ -12,7 +12,7 @@ ENABLE_LINK_SHORTENING = true
 GOOGLE_CALENDAR_ID = "c_1cdf51574bb6ac183721c99fae8dc7deba72c48fe0e0c7e892f26b6c974cd15c@group.calendar.google.com"
 
 OPENAI_MODEL = "gpt-4o-2024-08-06"
-OPENAI_REASONING_MODEL = "o1-2024-12-17"
+OPENAI_REASONING_MODEL = "o1"
 
 GEMINI_MODEL = "gemini-2.0-flash"
 GEMINI_REASONING_MODEL = "gemini-2.0-flash-thinking-exp"
