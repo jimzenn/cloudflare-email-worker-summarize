@@ -2,7 +2,7 @@ import { Address, Email } from "postal-mime";
 import { Env } from "@/types/env";
 import { replaceWithShortenedUrls } from "@/utils/link";
 import { markdownv2 as format } from "telegram-format";
-
+import { escapeMarkdownV2 } from "@/services/telegram";
 export function removeRepeatedEmptyLines(text: string): string {
   return text.replace(/(\n\s*){3,}/g, '\n\n');
 }
@@ -27,5 +27,5 @@ export function stylizedFullSender(email: Email): string {
   if (!email.from.name) { 
     return format.monospace(email.from.address);
   }
-  return `${format.bold(email.from.name)} \\<${format.monospace(email.from.address)}\\>`;
+  return `${format.bold(escapeMarkdownV2(email.from.name))} \\<${format.monospace(email.from.address)}\\>`;
 }

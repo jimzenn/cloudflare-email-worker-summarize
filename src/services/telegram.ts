@@ -30,7 +30,7 @@ function escapeParenthesesAndBrackets(text: string): string {
   return parts.join('');
 }
 
-function escapeMarkdownV2(text: string): string {
+export function escapeMarkdownV2(text: string): string {
   const specialChars = /(?<!\\)[>#+={}.!\-|]/g;
   const escapedText = text
     .replace(/\|\|/g, '{{DOUBLEPIPE}}') // Temporarily replace || with placeholder
