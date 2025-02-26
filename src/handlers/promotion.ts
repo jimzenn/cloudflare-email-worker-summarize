@@ -19,7 +19,8 @@ Analyze the promotional email and extract key information.
 - The promotionItem should be a descriptive formal product name: "CitiBank Premier Credit Card", "Amazon Prime Membership", "Apple AirPods Pro", "Disney+ Subscription", etc.
 - The itemDescription should be a concise description of the item being promoted, e.g. "A credit card that focuses on travel and dining.", "A membership that offers free shipping and streaming services.", "A pair of headphones with noise cancellation.", "A streaming service that offers a free trial.", etc.
 - The deal should follow the following format:
-    - "~" surrounded text means strikethrough formatted text.
+    - "~" surrounded text means strikethrough formatted text, e.g. "~$100~$90 (-$10)" means "instead of $100, it is now $90". Don't use "~" for other purposes.
+    - Use "≈" to indicate approximate value. e.g. "≈$100" means "approximately $100".
     - "~$100~$90 (-$10)" (i.e. $100 before deal, $90 after deal).
     - "~$100~$80/year (-$20/year)" (i.e. $100/year before deal, $80/year after deal).
     - Always convert recurring price to yearly price. For example, "~$10~$8/month (-$2/month)" should be "~$120~$96/year (-$24/year, billed annually)".
