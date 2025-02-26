@@ -1,10 +1,9 @@
 import PromotionSchema from "@/schemas/PromotionSchema.json";
-import { queryOpenAI } from "@/services/openai";
 import { sendPushoverNotification } from "@/services/pushover";
 import { sendTelegramMessage } from "@/services/telegram";
 import { Env } from "@/types/env";
 import { PromotionDetails } from "@/types/promotion";
-import { createEmailPrompt, fullSender } from "@/utils/email";
+import { createEmailPrompt, stylizedFullSender } from "@/utils/email";
 import { Email } from "postal-mime";
 import { formatPromotionMessage } from "@/formatters/promotion";
 import { Handler } from "@/types/handler";
@@ -105,7 +104,7 @@ export class PromotionHandler implements Handler {
     const title = `💰 Promotion from ${analysis.vendor}`;
     await Promise.all([
       sendPushoverNotification(title, message, this.env),
-      sendTelegramMessage(fullSender(this.email), title, message, this.env)
+      sendTelegramMessage(stylizedFullSender(this.email), title, message, this.env)
     ]);
   }
 } 

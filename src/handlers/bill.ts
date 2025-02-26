@@ -5,7 +5,7 @@ import { sendTelegramMessage } from "@/services/telegram";
 import { BillInfo } from "@/types/bill";
 import { Env } from "@/types/env";
 import { Handler } from "@/types/handler";
-import { fullSender } from "@/utils/email";
+import { stylizedFullSender } from "@/utils/email";
 import { extractInformation } from "@/utils/extract";
 import { Email } from "postal-mime";
 
@@ -47,7 +47,7 @@ export class BillHandler implements Handler {
     const billInfo: BillInfo = await extractInformation(this.email, PROMPT_EXTRACT_BILL_INFO, BillSchema, "BillInfo", this.env);
     const { title, message } = formatBillMessage(billInfo);
 
-    await sendTelegramMessage(fullSender(this.email), title, message, this.env);
+    await sendTelegramMessage(stylizedFullSender(this.email), title, message, this.env);
 
     if (billInfo.calendar_event) {
       await createCalendarEvent(billInfo.calendar_event, this.env);

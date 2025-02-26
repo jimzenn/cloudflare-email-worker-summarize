@@ -3,7 +3,7 @@ import { sendPushoverNotification } from "@/services/pushover";
 import { sendTelegramMessage } from "@/services/telegram";
 import { Env } from "@/types/env";
 import { VerificationCode } from "@/types/verification";
-import { fullSender } from "@/utils/email";
+import { stylizedFullSender } from "@/utils/email";
 import { extractInformation } from "@/utils/extract";
 import { Email } from "postal-mime";
 import { Handler } from "@/types/handler";
@@ -28,7 +28,7 @@ export class VerificationHandler implements Handler {
     const message = `*${title}* \`${code}\``;
     await Promise.all([
       sendPushoverNotification(title, message, this.env),
-      sendTelegramMessage(fullSender(this.email), title, message, this.env)
+      sendTelegramMessage(stylizedFullSender(this.email), title, message, this.env)
     ]);
   }
 }

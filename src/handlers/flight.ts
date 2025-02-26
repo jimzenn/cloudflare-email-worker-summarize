@@ -6,7 +6,7 @@ import { CalendarEvent } from "@/types/calendarEvent";
 import { Env } from "@/types/env";
 import { FlightItinerary, FlightSegment } from "@/types/flight";
 import { Handler } from "@/types/handler";
-import { fullSender } from "@/utils/email";
+import { stylizedFullSender } from "@/utils/email";
 import { extractInformation } from "@/utils/extract";
 import { Email } from "postal-mime";
 
@@ -57,7 +57,7 @@ export class FlightHandler implements Handler {
       console.log('[Flight] Formatted flight itinerary:', message);
 
       await Promise.all([
-        sendTelegramMessage(fullSender(this.email), title, message, this.env),
+        sendTelegramMessage(stylizedFullSender(this.email), title, message, this.env),
         addFlightToCalendar(flightItinerary, this.env)
       ]);
 

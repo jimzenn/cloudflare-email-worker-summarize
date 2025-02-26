@@ -2,7 +2,7 @@ import { Env } from "@/types/env";
 import { Email } from "postal-mime";
 import { PROMPT_SUMMARIZE_MARKDOWN_V2 } from "@/prompts/actions";
 import { queryOpenAI } from "@/services/openai";
-import { createEmailPrompt, fullSender } from "@/utils/email";
+import { createEmailPrompt, stylizedFullSender } from "@/utils/email";
 import { sendTelegramMessage } from "@/services/telegram";
 import SummarizeSchema from "@/schemas/SummarizeSchema.json";
 import { Handler } from "@/types/handler";
@@ -25,6 +25,6 @@ export class SummarizeHandler implements Handler {
     const summary = parsed.summary;
     const additionalNotes = parsed.additional_notes;
 
-    await sendTelegramMessage(fullSender(this.email), this.email.subject || '(No subject)', summary, this.env);
+    await sendTelegramMessage(stylizedFullSender(this.email), this.email.subject || '(No subject)', summary, this.env);
   }
 }

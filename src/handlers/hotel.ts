@@ -4,7 +4,7 @@ import { sendTelegramMessage } from "@/services/telegram";
 import { Env } from "@/types/env";
 import { Handler } from "@/types/handler";
 import { HotelStay } from "@/types/hotel";
-import { fullSender } from "@/utils/email";
+import { stylizedFullSender } from "@/utils/email";
 import { extractInformation } from "@/utils/extract";
 import { Email } from "postal-mime";
 
@@ -35,7 +35,7 @@ export class HotelHandler implements Handler {
       const message = formatHotelStay(hotelStay);
       const title = `🏨 ${hotelStay.guestName}: ${hotelStay.hotelName}`;
       console.log('[Hotel] Formatted hotel stay:', message);
-      await sendTelegramMessage(fullSender(this.email), title, message, this.env);
+      await sendTelegramMessage(stylizedFullSender(this.email), title, message, this.env);
     } catch (error) {
       console.error('[Hotel] Error processing hotel:', error);
       throw error;

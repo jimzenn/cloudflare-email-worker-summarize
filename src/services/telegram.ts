@@ -8,25 +8,25 @@ const TELEGRAM_API_BASE = 'https://api.telegram.org/bot';
 function escapeParenthesesAndBrackets(text: string): string {
   // Match markdown links pattern: [text](url)
   const linkPattern = /\[([^\]]+)\]\(([^)]+)\)/g;
-  
+
   // Split text into links and non-links
   const parts: string[] = [];
   let lastIndex = 0;
-  
+
   for (const match of text.matchAll(linkPattern)) {
     // Add text before the link, escaping unescaped brackets/parentheses
     const beforeLink = text.slice(lastIndex, match.index)
       .replace(/(?<!\\)[\[\]()]/g, '\\$&');
     parts.push(beforeLink);
-    
+
     // Add the link unchanged
     parts.push(match[0]);
     lastIndex = (match.index ?? 0) + match[0].length;
   }
-  
+
   // Add remaining text, escaping unescaped brackets/parentheses
   parts.push(text.slice(lastIndex).replace(/(?<!\\)[\[\]()]/g, '\\$&'));
-  
+
   return parts.join('');
 }
 
@@ -43,7 +43,7 @@ function formatMarkdownMessage(subject: string, sender: string, text: string): s
   return [
     format.blockquote([
       format.bold(escapeMarkdownV2(subject)),
-      "from: " + format.monospace(sender),
+      "from: " + sender,
     ].join('\n')),
     text
   ].join('\n\n');
@@ -59,9 +59,9 @@ function formatPlainMessage(subject: string, sender: string, text: string): stri
 }
 
 async function sendTelegramRequest(
-  apiUrl: string, 
-  chatId: string, 
-  text: string, 
+  apiUrl: string,
+  chatId: string,
+  text: string,
   parseMode?: 'MarkdownV2'
 ): Promise<Response> {
   return fetch(apiUrl, {
@@ -76,9 +76,9 @@ async function sendTelegramRequest(
 }
 
 export async function sendTelegramMessage(
-  sender: string, 
-  subject: string, 
-  text: string, 
+  sender: string,
+  subject: string,
+  text: string,
   env: Env
 ): Promise<void> {
   const apiUrl = `${TELEGRAM_API_BASE}${env.TELEGRAM_BOT_TOKEN}/sendMessage`;
@@ -88,11 +88,11 @@ export async function sendTelegramMessage(
   // Try sending formatted message first
   const formattedMsg = formatMarkdownMessage(subject, sender, shortenedText);
   console.log('Sending Telegram message:', formattedMsg);
-  
+
   const response = await sendTelegramRequest(
-    apiUrl, 
-    env.TELEGRAM_TO_CHAT_ID, 
-    formattedMsg, 
+    apiUrl,
+    env.TELEGRAM_TO_CHAT_ID,
+    formattedMsg,
     'MarkdownV2'
   );
 
@@ -106,8 +106,8 @@ export async function sendTelegramMessage(
 
     const plainMsg = formatPlainMessage(subject, sender, shortenedText);
     const retryResponse = await sendTelegramRequest(
-      apiUrl, 
-      env.TELEGRAM_TO_CHAT_ID, 
+      apiUrl,
+      env.TELEGRAM_TO_CHAT_ID,
       plainMsg
     );
 
