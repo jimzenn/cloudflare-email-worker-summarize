@@ -73,7 +73,7 @@ async function analyzePromotion(
     env,
     PromotionSchema,
     "PromotionDetails",
-    "o3-mini",
+    true,
   );
 
   try {
