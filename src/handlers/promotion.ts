@@ -73,8 +73,6 @@ async function analyzePromotion(
     PromotionSchema,
     "PromotionDetails",
     true,
-    "gemini",
-    0.7
   );
 
   try {
