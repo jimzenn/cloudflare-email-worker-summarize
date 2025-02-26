@@ -23,7 +23,11 @@ export async function makeAPIRequest<T>(
   timeoutMs: number = 600000 // 10 minutes
 ): Promise<T> {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  const timeoutId = setTimeout(() => {
+    console.log(`[🤖${provider}] Request timed out after ${timeoutMs}ms`);
+    controller.abort();
+    throw new LLMTimeoutError(timeoutMs);
+  }, timeoutMs);
   const startTime = Date.now();
 
   console.log(`[🤖${provider}] Request starting...`);
@@ -35,18 +39,10 @@ export async function makeAPIRequest<T>(
 
   try {
     let response: Response;
-    try {
-      response = await fetch(url, {
-        ...options,
-        signal: controller.signal,
-      });
-    } catch (error) {
-      if (error instanceof Error && error.name === 'AbortError') {
-        console.log(`[🤖${provider}] Request timed out after ${timeoutMs}ms`);
-        throw new LLMTimeoutError(timeoutMs);
-      }
-      throw error;
-    }
+    response = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+    });
 
     if (!response.ok) {
       const errorText = await response.text();
