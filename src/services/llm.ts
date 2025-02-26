@@ -20,7 +20,7 @@ export async function makeAPIRequest<T>(
   provider: string,
   url: string,
   options: RequestInit,
-  timeoutMs: number
+  timeoutMs: number = 600000 // 10 minutes
 ): Promise<T> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
@@ -42,6 +42,7 @@ export async function makeAPIRequest<T>(
       });
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
+        console.log(`[🤖${provider}] Request timed out after ${timeoutMs}ms`);
         throw new LLMTimeoutError(timeoutMs);
       }
       throw error;

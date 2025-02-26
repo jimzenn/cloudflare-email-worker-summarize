@@ -52,7 +52,6 @@ async function makeGeminiRequest(
   url: string,
   body: GeminiRequest,
   apiKey: string,
-  timeoutMs: number
 ): Promise<GeminiResponse> {
   const requestOptions = {
     method: "POST",
@@ -64,7 +63,7 @@ async function makeGeminiRequest(
   };
 
   try {
-    return await makeAPIRequest<GeminiResponse>("Gemini", url, requestOptions, timeoutMs);
+    return await makeAPIRequest<GeminiResponse>("Gemini", url, requestOptions);
   } catch (error) {
     if (error instanceof LLMError) {
       throw new GeminiError(error.message, error.cause);
@@ -169,7 +168,6 @@ export async function queryGemini(
       `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
       body,
       apiKey,
-      60000
     );
 
     const content = response.candidates?.[0]?.content?.parts?.[0]?.text;

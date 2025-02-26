@@ -54,7 +54,6 @@ async function makeOpenAIRequest(
   url: string,
   body: ChatCompletionRequest,
   apiKey: string,
-  timeoutMs: number
 ): Promise<ChatCompletionResponse> {
   const requestOptions = {
     method: "POST",
@@ -66,7 +65,7 @@ async function makeOpenAIRequest(
   };
 
   try {
-    return await makeAPIRequest<ChatCompletionResponse>("OpenAI", url, requestOptions, timeoutMs);
+    return await makeAPIRequest<ChatCompletionResponse>("OpenAI", url, requestOptions);
   } catch (error) {
     if (error instanceof LLMError) {
       throw new OpenAIError(error.message, error.cause);
@@ -128,7 +127,6 @@ export async function queryOpenAI(
       "https://api.openai.com/v1/chat/completions",
       body,
       apiKey,
-      60000
     );
 
     const content = response.choices?.[0]?.message?.content;
