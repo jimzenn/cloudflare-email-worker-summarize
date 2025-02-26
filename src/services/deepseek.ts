@@ -118,8 +118,7 @@ export async function queryDeepSeek(
     const result = content.trim();
     console.log(`[🤖DeepSeek|${model}] Response: ${result}`);
     
-    const parsedResult = JSON.parse(result);
-    return parsedResult.answer;
+    return result;
 
   } catch (error) {
     if (error instanceof DeepSeekError) {
