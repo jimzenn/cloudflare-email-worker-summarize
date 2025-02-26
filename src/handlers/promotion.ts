@@ -8,7 +8,7 @@ import { createEmailPrompt, fullSender } from "@/utils/email";
 import { Email } from "postal-mime";
 import { formatPromotionMessage } from "@/formatters/promotion";
 import { Handler } from "@/types/handler";
-
+import { queryLLM } from "@/services/llm";
 const PROMPT_ANALYZE_PROMOTION = `
 Analyze the promotional email and extract key information.
 
@@ -67,13 +67,15 @@ async function analyzePromotion(
   ${prompt}
 `;
 
-  const response = await queryOpenAI(
+  const response = await queryLLM(
     PROMPT_ANALYZE_PROMOTION,
     contextEnhancedPrompt,
     env,
     PromotionSchema,
     "PromotionDetails",
     true,
+    "gemini",
+    0.7
   );
 
   try {
