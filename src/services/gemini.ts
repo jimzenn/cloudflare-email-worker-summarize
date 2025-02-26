@@ -73,6 +73,47 @@ async function makeGeminiRequest(
   }
 }
 
+function stripSchemaMetadata(schema: any): any {
+  const { 
+    properties, 
+    required, 
+    type, 
+    items,
+    format,
+    enum: enumValues,
+    description,
+    nullable,
+    maxItems,
+    minItems,
+    propertyOrdering,
+    // Explicitly remove unsupported properties
+    $schema,
+    additionalProperties,
+    ...rest 
+  } = schema;
+  
+  const cleanedSchema: any = {
+    // Convert type to uppercase as required by Gemini API
+    ...(type && { type: type.toUpperCase() }),
+    ...(format && { format }),
+    ...(enumValues && { enum: enumValues }),
+    ...(description && { description }),
+    ...(nullable && { nullable }),
+    ...(maxItems && { maxItems }),
+    ...(minItems && { minItems }),
+    ...(propertyOrdering && { propertyOrdering }),
+    ...(properties && { 
+      properties: Object.fromEntries(
+        Object.entries(properties).map(([key, value]) => [key, stripSchemaMetadata(value)])
+      )
+    }),
+    ...(items && { items: stripSchemaMetadata(items) }),
+    ...(required && { required })
+  };
+
+  return cleanedSchema;
+}
+
 /**
  * Queries the Google Gemini API with a system prompt and a user prompt.
  *
@@ -102,6 +143,8 @@ export async function queryGemini(
       throw new GeminiConfigError("GEMINI_API_KEY is not set");
     }
 
+    const cleanedSchema = stripSchemaMetadata(schema);
+
     const body: GeminiRequest = {
       contents: [
         {
@@ -120,7 +163,7 @@ export async function queryGemini(
       generationConfig: {
         temperature: temperature,
         responseMimeType: "application/json",
-        responseSchema: schema
+        responseSchema: cleanedSchema
       }
     };
 
