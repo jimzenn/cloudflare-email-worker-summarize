@@ -67,7 +67,7 @@ export async function queryLLM(
   schema: object,
   schemaName: string,
   reasoning: boolean = false,
-  provider: 'openai' | 'gemini' = 'gemini',
+  provider: 'openai' | 'gemini' = 'openai',
   temperature: number = 0,
 ): Promise<string> {
   if (provider === 'openai') {
