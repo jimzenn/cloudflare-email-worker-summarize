@@ -148,12 +148,8 @@ export async function queryGemini(
     const body: GeminiRequest = {
       contents: [
         {
-          role: "user",
-          parts: [{ text: systemPrompt }]
-        },
-        {
           role: "model",
-          parts: [{ text: "I understand and will help with your request." }]
+          parts: [{ text: "Here is my job description: " + systemPrompt }]
         },
         {
           role: "user",
