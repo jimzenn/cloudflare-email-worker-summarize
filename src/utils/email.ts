@@ -27,5 +27,5 @@ export function stylizedFullSender(email: Email): string {
   if (!email.from.name) { 
     return format.monospace(email.from.address);
   }
-  return `${format.bold(email.from.name)} <${format.monospace(email.from.address)}>`;
+  return `${format.bold(email.from.name)} \<${format.monospace(email.from.address)}\>`;
 }

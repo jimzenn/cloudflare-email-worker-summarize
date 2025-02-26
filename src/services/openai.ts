@@ -36,13 +36,6 @@ class OpenAIError extends Error {
   }
 }
 
-class OpenAITimeoutError extends OpenAIError {
-  constructor(timeoutMs: number) {
-    super(`Request timed out after ${timeoutMs}ms`);
-    this.name = 'OpenAITimeoutError';
-  }
-}
-
 class OpenAIConfigError extends OpenAIError {
   constructor(message: string) {
     super(message);
