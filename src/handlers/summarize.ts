@@ -1,7 +1,7 @@
 import { Env } from "@/types/env";
 import { Email } from "postal-mime";
 import { PROMPT_SUMMARIZE_MARKDOWN_V2 } from "@/prompts/actions";
-import { queryOpenAI } from "@/services/openai";
+import { queryGemini } from "@/services/gemini";
 import { createEmailPrompt, stylizedFullSender } from "@/utils/email";
 import { sendTelegramMessage } from "@/services/telegram";
 import SummarizeSchema from "@/schemas/SummarizeSchema.json";
@@ -13,7 +13,7 @@ export class SummarizeHandler implements Handler {
   async handle() {
     console.log(`[Summarize] Handling ${this.email.subject || '(No subject)'}`);
     
-    const summaryResponse = await queryOpenAI(
+    const summaryResponse = await queryGemini(
       PROMPT_SUMMARIZE_MARKDOWN_V2,
       await createEmailPrompt(this.email, this.env),
       this.env,
