@@ -82,11 +82,12 @@ export async function sendTelegramMessage(
   env: Env
 ): Promise<void> {
   const apiUrl = `${TELEGRAM_API_BASE}${env.TELEGRAM_BOT_TOKEN}/sendMessage`;
+  const escapedSubject = escapeMarkdownV2(subject);
   const escapedText = escapeMarkdownV2(text);
   const shortenedText = escapedText.slice(0, MAX_TELEGRAM_MESSAGE_LENGTH);
 
   // Try sending formatted message first
-  const formattedMsg = formatMarkdownMessage(subject, sender, shortenedText);
+  const formattedMsg = formatMarkdownMessage(escapedSubject, sender, shortenedText);
   console.log('Sending Telegram message:', formattedMsg);
 
   const response = await sendTelegramRequest(

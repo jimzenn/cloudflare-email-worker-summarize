@@ -6,6 +6,7 @@ import { createEmailPrompt, stylizedFullSender } from "@/utils/email";
 import { sendTelegramMessage } from "@/services/telegram";
 import SummarizeSchema from "@/schemas/SummarizeSchema.json";
 import { Handler } from "@/types/handler";
+import { SummarizeResponse } from "@/types/summarize";
 
 export class SummarizeHandler implements Handler {
   constructor(private email: Email, private domainKnowledges: string[], private env: Env) { }
@@ -21,10 +22,10 @@ export class SummarizeHandler implements Handler {
       "SummarizeResponse"
     );
 
-    const parsed = JSON.parse(summaryResponse);
+    const parsed: SummarizeResponse = JSON.parse(summaryResponse);
     const summary = parsed.summary;
-    const additionalNotes = parsed.additional_notes;
+    const summarizedTitle = parsed.summarized_title;
 
-    await sendTelegramMessage(stylizedFullSender(this.email), this.email.subject || '(No subject)', summary, this.env);
+    await sendTelegramMessage(stylizedFullSender(this.email), summarizedTitle, summary, this.env);
   }
 }
