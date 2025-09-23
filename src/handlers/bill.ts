@@ -3,6 +3,7 @@ import BillSchema from "@/schemas/BillSchema.json";
 import { createCalendarEvent } from "@/services/calendar";
 import { sendTelegramMessage } from "@/services/telegram";
 import { BillInfo } from "@/types/bill";
+import { DebugInfo } from "@/types/debug";
 import { Env } from "@/types/env";
 import { Handler } from "@/types/handler";
 import { stylizedFullSender } from "@/utils/email";
@@ -39,7 +40,7 @@ The calendar event fields follows that of Google Calendar API v3.
 Ensure your response matches the provided JSON schema structure exactly.`;
 
 export class BillHandler implements Handler {
-  constructor(private email: Email, private domainKnowledges: string[], private env: Env) { }
+  constructor(private email: Email, private domainKnowledges: string[], private debugInfo: DebugInfo, private env: Env) { }
 
   async handle() {
     console.log(`[Bill] Handling ${this.email.subject || '(No subject)'}`);
@@ -47,7 +48,7 @@ export class BillHandler implements Handler {
     const billInfo: BillInfo = await extractInformation(this.email, PROMPT_EXTRACT_BILL_INFO, BillSchema, "BillInfo", this.env);
     const { title, message } = formatBillMessage(billInfo);
 
-    await sendTelegramMessage(stylizedFullSender(this.email), title, message, this.env);
+    await sendTelegramMessage(stylizedFullSender(this.email), title, message, this.debugInfo, this.env);
 
     if (billInfo.calendar_event) {
       await createCalendarEvent(billInfo.calendar_event, this.env);

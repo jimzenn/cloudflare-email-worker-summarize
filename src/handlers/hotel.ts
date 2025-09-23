@@ -1,6 +1,7 @@
 import { formatHotelStay } from "@/formatters/hotel";
 import HotelSchema from "@/schemas/HotelSchema.json";
 import { sendTelegramMessage } from "@/services/telegram";
+import { DebugInfo } from "@/types/debug";
 import { Env } from "@/types/env";
 import { Handler } from "@/types/handler";
 import { HotelStay } from "@/types/hotel";
@@ -26,7 +27,7 @@ Ensure your response matches the provided JSON schema structure exactly.
 
 
 export class HotelHandler implements Handler {
-  constructor(private email: Email, private domainKnowledges: string[], private env: Env) { }
+  constructor(private email: Email, private domainKnowledges: string[], private debugInfo: DebugInfo, private env: Env) { }
 
   async handle() {
     console.log(`[Hotel] Handling ${this.email.subject || '(No subject)'}`);
@@ -35,7 +36,7 @@ export class HotelHandler implements Handler {
       const message = formatHotelStay(hotelStay);
       const title = `🏨 ${hotelStay.guestName}: ${hotelStay.hotelName}`;
       console.log('[Hotel] Formatted hotel stay:', message);
-      await sendTelegramMessage(stylizedFullSender(this.email), title, message, this.env);
+      await sendTelegramMessage(stylizedFullSender(this.email), title, message, this.debugInfo, this.env);
     } catch (error) {
       console.error('[Hotel] Error processing hotel:', error);
       throw error;

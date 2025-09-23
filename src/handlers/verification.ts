@@ -1,6 +1,7 @@
 import VerificationSchema from "@/schemas/VerificationSchema.json";
 import { sendPushoverNotification } from "@/services/pushover";
 import { sendTelegramMessage } from "@/services/telegram";
+import { DebugInfo } from "@/types/debug";
 import { Env } from "@/types/env";
 import { VerificationCode } from "@/types/verification";
 import { stylizedFullSender } from "@/utils/email";
@@ -16,7 +17,7 @@ For each email extract verification code information and return it in a structur
 Ensure your response matches the provided JSON schema structure exactly.`;
 
 export class VerificationHandler implements Handler {
-  constructor(private email: Email, private domainKnowledges: string[], private env: Env) { }
+  constructor(private email: Email, private domainKnowledges: string[], private debugInfo: DebugInfo, private env: Env) { }
 
   async handle() {
     console.log(`[Verification] Handling ${this.email.subject || '(No subject)'}`);
@@ -28,7 +29,7 @@ export class VerificationHandler implements Handler {
     const message = `*${title}* \`${code}\``;
     await Promise.all([
       sendPushoverNotification(title, message, this.env),
-      sendTelegramMessage(stylizedFullSender(this.email), title, message, this.env)
+      sendTelegramMessage(stylizedFullSender(this.email), title, message, this.debugInfo, this.env)
     ]);
   }
 }

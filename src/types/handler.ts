@@ -1,4 +1,5 @@
 import { Email } from "postal-mime";
+import { DebugInfo } from "./debug";
 import { Env } from "./env";
 
 export interface Handler {
@@ -6,5 +7,5 @@ export interface Handler {
 }
 
 export interface HandlerConstructor {
-  new (email: Email, domainKnowledges: string[], env: Env): Handler;
+  new (email: Email, domainKnowledges: string[], debugInfo: DebugInfo, env: Env): Handler;
 } 

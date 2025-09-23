@@ -1,4 +1,5 @@
 import { Env } from '@/types/env';
+import { DebugInfo } from '@/types/debug';
 
 import { markdownv2 as format } from 'telegram-format';
 
@@ -39,22 +40,40 @@ export function escapeMarkdownV2(text: string): string {
   return escapeParenthesesAndBrackets(escapedText);
 }
 
-function formatMarkdownMessage(subject: string, sender: string, text: string): string {
+function formatDebugInfo(debugInfo: DebugInfo): string {
+  const { llmModel, category, startTime } = debugInfo;
+  const executionTime = startTime ? `${Date.now() - startTime}ms` : 'N/A';
+
+  const parts = [
+    `🤖 ${llmModel}`,
+    `🏷️ ${category}`,
+    `⏱️ ${executionTime}`,
+  ];
+
+  return format.italic(parts.map(escapeMarkdownV2).join(' | '));
+}
+
+function formatMarkdownMessage(subject: string, sender: string, text: string, debugInfo?: DebugInfo): string {
+  const debugString = debugInfo ? formatDebugInfo(debugInfo) : '';
   return [
     format.blockquote([
       format.bold(escapeMarkdownV2(subject)),
       "from: " + sender,
     ].join('\n')),
-    text
+    text,
+    debugString,
   ].join('\n\n');
 }
 
-function formatPlainMessage(subject: string, sender: string, text: string): string {
+function formatPlainMessage(subject: string, sender: string, text: string, debugInfo?: DebugInfo): string {
+  const debugString = debugInfo ? `[Debug: LLM: ${debugInfo.llmModel}, Category: ${debugInfo.category}, Time: ${debugInfo.startTime ? Date.now() - debugInfo.startTime : 'N/A'}ms]` : '';
   return [
     `${subject}`,
     `from: ${sender}`,
     '',
-    text
+    text,
+    '',
+    debugString,
   ].join('\n');
 }
 
@@ -79,6 +98,7 @@ export async function sendTelegramMessage(
   sender: string,
   subject: string,
   text: string,
+  debugInfo: DebugInfo,
   env: Env
 ): Promise<void> {
   const apiUrl = `${TELEGRAM_API_BASE}${env.TELEGRAM_BOT_TOKEN}/sendMessage`;
@@ -87,7 +107,7 @@ export async function sendTelegramMessage(
   const shortenedText = escapedText.slice(0, MAX_TELEGRAM_MESSAGE_LENGTH);
 
   // Try sending formatted message first
-  const formattedMsg = formatMarkdownMessage(escapedSubject, sender, shortenedText);
+  const formattedMsg = formatMarkdownMessage(escapedSubject, sender, shortenedText, debugInfo);
   console.log('Sending Telegram message:', formattedMsg);
 
   const response = await sendTelegramRequest(
@@ -105,7 +125,7 @@ export async function sendTelegramMessage(
       errorData,
     });
 
-    const plainMsg = formatPlainMessage(subject, sender, shortenedText);
+    const plainMsg = formatPlainMessage(subject, sender, shortenedText, debugInfo);
     const retryResponse = await sendTelegramRequest(
       apiUrl,
       env.TELEGRAM_TO_CHAT_ID,

@@ -6,6 +6,7 @@ import { SummarizeHandler } from "./handlers/summarize";
 import { BillHandler } from "./handlers/bill";
 import { HotelHandler } from "@/handlers/hotel";
 import { PromotionHandler } from "@/handlers/promotion";
+import { DebugInfo } from "@/types/debug";
 import { HandlerConstructor } from "@/types/handler";
 
 const handlerMap: Record<string, HandlerConstructor[]> = {
@@ -17,13 +18,13 @@ const handlerMap: Record<string, HandlerConstructor[]> = {
   default: [SummarizeHandler],
 } as const;
 
-export async function dispatchToHandler(email: Email, category: string, domainKnowledges: string[], env: Env) {
+export async function dispatchToHandler(email: Email, category: string, domainKnowledges: string[], debugInfo: DebugInfo, env: Env) {
   console.log(`[📨Dispatcher] Dispatching to handlers for category: ${category}`);
   
   const handlers = handlerMap[category] || handlerMap.default;
   
   await Promise.all(handlers.map(async (HandlerClass) => {
-    const handler = new HandlerClass(email, domainKnowledges, env);
+    const handler = new HandlerClass(email, domainKnowledges, debugInfo, env);
     await handler.handle();
   }));
 }
