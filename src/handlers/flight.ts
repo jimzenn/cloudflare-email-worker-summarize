@@ -3,6 +3,7 @@ import FlightSchema from "@/schemas/FlightSchema.json";
 import { createCalendarEvent } from "@/services/calendar";
 import { sendTelegramMessage } from "@/services/telegram";
 import { CalendarEvent } from "@/types/calendarEvent";
+import { DebugInfo } from "@/types/debug";
 import { Env } from "@/types/env";
 import { FlightItinerary, FlightSegment } from "@/types/flight";
 import { Handler } from "@/types/handler";
@@ -43,7 +44,7 @@ async function addFlightToCalendar(flightItinerary: FlightItinerary, env: Env) {
 }
 
 export class FlightHandler implements Handler {
-  constructor(private email: Email, private domainKnowledges: string[], private env: Env) {
+  constructor(private email: Email, private domainKnowledges: string[], private debugInfo: DebugInfo, private env: Env) {
   }
 
   async handle() {
@@ -57,7 +58,7 @@ export class FlightHandler implements Handler {
       console.log('[Flight] Formatted flight itinerary:', message);
 
       await Promise.all([
-        sendTelegramMessage(stylizedFullSender(this.email), title, message, this.env),
+        sendTelegramMessage(stylizedFullSender(this.email), title, message, this.debugInfo, this.env),
         addFlightToCalendar(flightItinerary, this.env)
       ]);
 

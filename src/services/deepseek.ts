@@ -77,7 +77,7 @@ export async function queryDeepSeek(
   schemaName: string,
   reasoning: boolean = false,
   temperature: number = 0,
-): Promise<string> {
+): Promise<{ response: string; model: string }> {
   try {
     const apiKey = env.DEEPSEEK_API_KEY;
     const model = reasoning ? env.DEEPSEEK_REASONING_MODEL : env.DEEPSEEK_MODEL;
@@ -118,7 +118,7 @@ export async function queryDeepSeek(
     const result = content.trim();
     console.log(`[🤖DeepSeek|${model}] Response: ${result}`);
     
-    return result;
+    return { response: result, model };
 
   } catch (error) {
     if (error instanceof DeepSeekError) {

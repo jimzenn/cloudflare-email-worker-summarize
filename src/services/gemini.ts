@@ -133,7 +133,7 @@ export async function queryGemini(
   schemaName: string,
   reasoning: boolean = false,
   temperature: number = 0,
-): Promise<string> {
+): Promise<{ response: string; model: string }> {
   try {
     const apiKey = env.GEMINI_API_KEY;
     const model = reasoning ? env.GEMINI_REASONING_MODEL : env.GEMINI_MODEL;
@@ -177,7 +177,7 @@ export async function queryGemini(
 
     const result = content.trim();
     console.log(`[🤖Gemini|${model}] Response: ${result}`);
-    return result;
+    return { response: result, model };
 
   } catch (error) {
     if (error instanceof GeminiError) {

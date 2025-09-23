@@ -21,9 +21,6 @@ For each email, provide:
   - "promotion" (e.g. promotion offer, discount, etc.)
   - "policy_change" (e.g. terms of service, privacy policy, etc.)
   - "verification" (e.g. verification code, etc.)
-  // drop handlers
-  - "welcome" (e.g. welcome email, new user registration, etc.)
-  - "drop" (e.g. email that should be dropped, etc.)
   - "newsletter" (e.g. news, newsletter, etc.)
   - "tracking" (e.g. shipped, delivery, order status, etc.)
   - "notification" (e.g. confirmation of account change, confirmation of email change, flash flood alert, etc.)

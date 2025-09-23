@@ -67,7 +67,7 @@ export async function queryLLM(
   reasoning: boolean = false,
   provider: 'openai' | 'gemini' | 'deepseek' = 'openai',
   temperature: number = 0.7,
-): Promise<string> {
+): Promise<{ response: string; model: string }> {
   if (provider === 'openai') {
     return queryOpenAI(systemPrompt, userPrompt, env, schema, schemaName, reasoning, temperature);
   } else if (provider === 'gemini') {

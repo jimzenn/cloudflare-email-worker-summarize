@@ -1,6 +1,7 @@
 import PromotionSchema from "@/schemas/PromotionSchema.json";
 import { sendPushoverNotification } from "@/services/pushover";
 import { sendTelegramMessage } from "@/services/telegram";
+import { DebugInfo } from "@/types/debug";
 import { Env } from "@/types/env";
 import { PromotionDetails } from "@/types/promotion";
 import { createEmailPrompt, stylizedFullSender } from "@/utils/email";
@@ -53,6 +54,7 @@ If any field is not applicable, return an empty string or empty array as appropr
 async function analyzePromotion(
   email: Email,
   domainKnowledges: string[],
+  debugInfo: DebugInfo,
   env: Env
 ): Promise<PromotionDetails> {
   console.log('[Promotion] Analyzing email:', email.subject);
@@ -67,7 +69,7 @@ async function analyzePromotion(
   ${prompt}
 `;
 
-  const response = await queryLLM(
+  const { response, model } = await queryLLM(
     PROMPT_ANALYZE_PROMOTION,
     contextEnhancedPrompt,
     env,
@@ -75,6 +77,8 @@ async function analyzePromotion(
     "PromotionDetails",
     true,
   );
+
+  debugInfo.llmModel = model;
 
   try {
     const parsed = JSON.parse(response);
@@ -90,20 +94,21 @@ export class PromotionHandler implements Handler {
   constructor(
     private email: Email,
     private domainKnowledges: string[],
+    private debugInfo: DebugInfo,
     private env: Env
   ) { }
 
 
   async handle() {
     console.log(`[Promotion] Handling ${this.email.subject || '(No subject)'}`);
-    const analysis = await analyzePromotion(this.email, this.domainKnowledges, this.env);
+    const analysis = await analyzePromotion(this.email, this.domainKnowledges, this.debugInfo, this.env);
 
     const message = formatPromotionMessage(analysis);
 
     const title = `💰 Promotion from ${analysis.vendor}`;
     await Promise.all([
       sendPushoverNotification(title, message, this.env),
-      sendTelegramMessage(stylizedFullSender(this.email), title, message, this.env)
+      sendTelegramMessage(stylizedFullSender(this.email), title, message, this.debugInfo, this.env)
     ]);
   }
 } 

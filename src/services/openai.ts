@@ -94,7 +94,7 @@ export async function queryOpenAI(
   schemaName: string,
   reasoning: boolean = false,
   temperature: number = 0,
-): Promise<string> {
+): Promise<{ response: string; model: string }> {
 
   try {
     const apiKey = env.OPENAI_API_KEY;
@@ -136,7 +136,7 @@ export async function queryOpenAI(
 
     const result = content.trim();
     console.log(`[🤖OpenAI|${model}] Response: ${result}`);
-    return result;
+    return { response: result, model };
 
   } catch (error) {
     if (error instanceof OpenAIError) {
