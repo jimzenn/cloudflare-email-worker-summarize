@@ -7,6 +7,7 @@ import { BillHandler } from "./handlers/bill";
 import { HotelHandler } from "@/handlers/hotel";
 import { PromotionHandler } from "@/handlers/promotion";
 import { HandlerConstructor } from "@/types/handler";
+import { DropHandler } from "@/handlers/drop";
 
 const handlerMap: Record<string, HandlerConstructor[]> = {
   flight: [FlightHandler],
@@ -14,6 +15,8 @@ const handlerMap: Record<string, HandlerConstructor[]> = {
   verification: [VerificationHandler],
   hotel: [HotelHandler],
   promotion: [PromotionHandler],
+  welcome: [DropHandler],
+  drop: [DropHandler],
   default: [SummarizeHandler],
 } as const;
 
