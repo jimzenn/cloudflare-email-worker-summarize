@@ -15,7 +15,7 @@ export default {
       console.log(`📥 From: ${email.from.address}, Subject: "${email.subject}"`);
 
       const { triageInfo, debugInfo: triageDebugInfo } = await triageEmail(email, env);
-      debugInfo = { ...triageDebugInfo, startTime };
+      debugInfo = { ...triageDebugInfo, startTime, messageId: message.headers.get('Message-ID') ?? undefined };
 
       const category = triageInfo.category;
       const domainKnowledges = triageInfo.domainKnowledge;
