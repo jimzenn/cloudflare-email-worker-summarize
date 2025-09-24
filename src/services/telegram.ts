@@ -32,11 +32,14 @@ function escapeParenthesesAndBrackets(text: string): string {
 }
 
 export function escapeMarkdownV2(text: string): string {
-  const specialChars = /(?<!\\)[>#+={}.!\-|]/g;
+  // Added '<' to the list of special characters
+  const specialChars = /(?<!\\)[><#+={}.!\-|]/g; 
+  
   const escapedText = text
     .replace(/\|\|/g, '{{DOUBLEPIPE}}') // Temporarily replace || with placeholder
     .replace(specialChars, '\\$&')
     .replace(/{{DOUBLEPIPE}}/g, '||'); // Restore || without escaping
+    
   return escapeParenthesesAndBrackets(escapedText);
 }
 
