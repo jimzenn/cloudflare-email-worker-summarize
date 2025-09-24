@@ -69,7 +69,7 @@ function formatMarkdownMessage(subject: string, sender: string, text: string, de
 }
 
 function formatPlainMessage(subject: string, sender: string, text: string, debugInfo?: DebugInfo): string {
-  const debugString = debugInfo ? escapeMarkdownV2(`[Debug: LLM: ${debugInfo.llmModel}, Category: ${debugInfo.category}, Time: ${debugInfo.startTime ? Date.now() - debugInfo.startTime/1000.0 : 'N/A'}s, MessageID: ${debugInfo.messageId}]`) : '';
+  const debugString = debugInfo ? escapeMarkdownV2(`[Debug: LLM: ${debugInfo.llmModel}, Category: ${debugInfo.category}, Time: ${debugInfo.startTime ? (Date.now() - debugInfo.startTime)/1000.0 : 'N/A'}s, MessageID: ${debugInfo.messageId}]`) : '';
   return [
     `${subject}`,
     `from: ${sender}`,
