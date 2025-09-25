@@ -56,6 +56,36 @@ function formatDebugInfo(debugInfo: DebugInfo): string {
   return format.italic(parts.map(escapeMarkdownV2).join(' \\| '));
 }
 
+function formatMarkdownBrief(text: string, debugInfo?: DebugInfo): string {
+  const debugString = debugInfo ? formatDebugInfo(debugInfo) : '';
+  return [
+    text,
+    debugString,
+  ].join('\n\n');
+}
+
+function formatPlainBrief(
+  text: string,
+  debugInfo?: DebugInfo
+): string {
+  const debugString = debugInfo
+    ? escapeMarkdownV2(
+        `[Debug: LLM: ${debugInfo.llmModel}, Category: ${
+          debugInfo.category
+        }, Time: ${
+          debugInfo.startTime
+            ? (Date.now() - debugInfo.startTime) / 1000.0
+            : 'N/A'
+        }s, MessageID: ${debugInfo.messageId}]`
+      )
+    : '';
+  return [
+    text,
+    '',
+    debugString,
+  ].join('\n');
+}
+
 function formatMarkdownMessage(subject: string, sender: string, text: string, debugInfo?: DebugInfo): string {
   const debugString = debugInfo ? formatDebugInfo(debugInfo) : '';
   return [
@@ -110,6 +140,53 @@ async function sendTelegramRequest(
       ...(parseMode && { parse_mode: parseMode })
     }),
   });
+}
+
+export async function sendTelegramBrief(
+  text: string,
+  debugInfo: DebugInfo,
+  env: Env
+): Promise<void> {
+  const apiUrl = `${TELEGRAM_API_BASE}${env.TELEGRAM_BOT_TOKEN}/sendMessage`;
+  const escapedText = escapeMarkdownV2(text);
+  const shortenedText = escapedText.slice(0, MAX_TELEGRAM_MESSAGE_LENGTH);
+
+  // Try sending formatted message first
+  const formattedMsg = formatMarkdownBrief(shortenedText, debugInfo);
+  console.log('Sending Telegram brief:', formattedMsg);
+
+  const response = await sendTelegramRequest(
+    apiUrl,
+    env.TELEGRAM_TO_CHAT_ID,
+    formattedMsg,
+    'MarkdownV2'
+  );
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    console.error('Telegram API error:', {
+      status: response.status,
+      statusText: response.statusText,
+      errorData,
+    });
+
+    const plainMsg = formatPlainBrief(text.slice(0, MAX_TELEGRAM_MESSAGE_LENGTH), debugInfo);
+    const retryResponse = await sendTelegramRequest(
+      apiUrl,
+      env.TELEGRAM_TO_CHAT_ID,
+      plainMsg
+    );
+
+    if (!retryResponse.ok) {
+      const retryErrorData = await retryResponse.json().catch(() => null);
+      console.error('Telegram API retry error:', {
+        status: retryResponse.status,
+        statusText: retryResponse.statusText,
+        errorData: retryErrorData,
+      });
+      throw new Error('Failed to send Telegram brief after retry');
+    }
+  }
 }
 
 export async function sendTelegramMessage(
