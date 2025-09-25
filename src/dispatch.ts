@@ -5,6 +5,7 @@ import { Env } from "@/types/env";
 import { SummarizeHandler } from "./handlers/summarize";
 import { BillHandler } from "./handlers/bill";
 import { HotelHandler } from "@/handlers/hotel";
+import { NotificationHandler } from "@/handlers/notification";
 import { PromotionHandler } from "@/handlers/promotion";
 import { DebugInfo } from "@/types/debug";
 import { HandlerConstructor } from "@/types/handler";
@@ -15,6 +16,7 @@ const handlerMap: Record<string, HandlerConstructor[]> = {
   verification: [VerificationHandler],
   hotel: [HotelHandler],
   promotion: [PromotionHandler],
+  notification: [NotificationHandler],
   default: [SummarizeHandler],
 } as const;
 
