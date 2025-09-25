@@ -53,7 +53,7 @@ function formatDebugInfo(debugInfo: DebugInfo): string {
     `⏱️ ${executionTime}`,
   ];
 
-  return format.italic(parts.map(escapeMarkdownV2).join(' | '));
+  return format.italic(parts.map(escapeMarkdownV2).join(' \\| '));
 }
 
 function formatMarkdownMessage(subject: string, sender: string, text: string, debugInfo?: DebugInfo): string {
