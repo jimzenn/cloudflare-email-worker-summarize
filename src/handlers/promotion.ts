@@ -16,7 +16,7 @@ Analyze the promotional email and extract key information.
 - Extract all relevant details including prices, terms, and conditions
 - Compare with typical market rates or prices using the provided domain knowledge
 - Provide a clear verdict on whether this is a good deal
-- Your recommendation should be one of the following: "RECOMMENDED", "NEUTRAL", "NOT_RECOMMENDED"
+- Your recommendation should be one of the following: "RECOMMENDED", "NEUTRAL", "NOT_RECOMMENDED", "NOT_INFORMATIVE"
 - The promotionItem should be a descriptive formal product name: "CitiBank Premier Credit Card", "Amazon Prime Membership", "Apple AirPods Pro", "Disney+ Subscription", etc.
 - The itemDescription should be a concise description of the item being promoted, e.g. "A credit card that focuses on travel and dining.", "A membership that offers free shipping and streaming services.", "A pair of headphones with noise cancellation.", "A streaming service that offers a free trial.", etc.
 - The deal should follow the following format:
