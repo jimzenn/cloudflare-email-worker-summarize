@@ -45,7 +45,7 @@ export function escapeMarkdownV2(text: string): string {
 
 function formatDebugInfo(debugInfo: DebugInfo): string {
   const { llmModel, category, startTime } = debugInfo;
-  const executionTime = startTime ? `${Date.now() - startTime}ms` : 'N/A';
+  const executionTime = startTime ? `${(Date.now() - startTime) / 1000.0}s` : 'N/A';
 
   const parts = [
     `🤖 ${llmModel}`,
