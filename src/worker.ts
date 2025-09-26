@@ -26,7 +26,16 @@ export default {
 
       await dispatchToHandler(email, category, domainKnowledges, debugInfo, env);
     } catch (error) {
-      console.error('Email processing failed:', error);
+      if (error instanceof Error) {
+        console.error('Email processing failed:', {
+          name: error.name,
+          message: error.message,
+          stack: error.stack,
+          cause: error.cause,
+        });
+      } else {
+        console.error('Email processing failed with an unknown error type:', error);
+      }
       throw error;
     } finally {
       const endTime = Date.now();
