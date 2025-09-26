@@ -175,7 +175,9 @@ export async function queryGemini(
       throw new GeminiResponseError("Invalid API response - missing content");
     }
 
-    const result = content.trim();
+    // When Gemini is used with a JSON schema, it may return a stringified JSON or a JSON object
+    const result = typeof content === 'string' ? content.trim() : JSON.stringify(content);
+
     console.log(`[🤖Gemini|${model}] Response: ${result}`);
     return { response: result, model };
 

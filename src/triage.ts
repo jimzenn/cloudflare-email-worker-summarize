@@ -26,7 +26,7 @@ export async function triageEmail(email: Email, env: Env): Promise<{ triageInfo:
       return { triageInfo, debugInfo };
     } catch (parseError) {
       console.error('Failed to parse triage response:', response);
-      throw new Error('Failed to parse triage response');
+      throw parseError;
     }
   }
   
