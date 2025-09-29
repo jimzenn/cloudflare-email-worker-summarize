@@ -1,4 +1,4 @@
-import { TriageInfo } from '@/types/triage';
+import { type TriageInfo } from '@/types/triage';
 
 export type TriageSchema = TriageInfo;
 
@@ -29,13 +29,13 @@ For each email, provide:
   - "offer" (e.g. job offer, etc.)
   - "actionable" (e.g. set up two-factor authentication, log in to my account, API change, etc.)
   - "other"
-- domain_knowledge: key topics needed to understand the email context, make sure you are knowledgeable about the email. Examples:
+- domainKnowledge: key topics needed to understand the email context, make sure you are knowledgeable about the email. Examples:
   - Software job offer: "SF tech job market", local salary ranges, and more.
   - Product review: "hairdryer specs", "market pricing", and more.
   - Financial: "credit card benefits", "rewards programs", and more.
   - Entertainment: specific show/event name, and more.
-- cleaned_email_body: proofread, cleaned text of the email with proper sentence structure, paragraph breaks, and grammar, without any formatting or html tags. KEEP ALL THE ORIGINAL INFORMATION! ONLY IMPROVE GRAMMAR, REMOVE FORMATTING AND HTML TAGS. IT'S OK TO BE VERBOSE or VERBATIM!
-- should_drop: a boolean value. Set to true if the email is absolutely useless and should be dropped. As my personal secretary, you should be aggressive in dropping emails that are not important.
+- cleanedEmailBody: proofread, cleaned text of the email with proper sentence structure, paragraph breaks, and grammar, without any formatting or html tags. KEEP ALL THE ORIGINAL INFORMATION! ONLY IMPROVE GRAMMAR, REMOVE FORMATTING AND HTML TAGS. IT'S OK TO BE VERBOSE or VERBATIM!
+- shouldDrop: a boolean value. Set to true if the email is absolutely useless and should be dropped. As my personal secretary, you should be aggressive in dropping emails that are not important.
   - Drop marketing emails that do not contain a specific, valuable deal.
   - Drop requests for surveys or feedback.
   - Drop social media notifications that don't require any action.
@@ -43,4 +43,4 @@ For each email, provide:
   - Do NOT drop promotional emails that provide a specific deal or coupon.
 
 Ensure your response matches the provided JSON schema structure exactly.
-`
+`;
