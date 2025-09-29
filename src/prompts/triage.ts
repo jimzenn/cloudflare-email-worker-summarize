@@ -9,6 +9,7 @@ For each email, provide:
 1. A category that best describes the email's purpose
 2. Key topics (domain knowledge) needed to understand the email context
 3. A cleaned version of the email body with proper formatting
+4. A boolean indicating if the email should be dropped
 
 - category: one of the following:
   - "flight"
@@ -34,6 +35,12 @@ For each email, provide:
   - Financial: "credit card benefits", "rewards programs", and more.
   - Entertainment: specific show/event name, and more.
 - cleaned_email_body: proofread, cleaned text of the email with proper sentence structure, paragraph breaks, and grammar, without any formatting or html tags. KEEP ALL THE ORIGINAL INFORMATION! ONLY IMPROVE GRAMMAR, REMOVE FORMATTING AND HTML TAGS. IT'S OK TO BE VERBOSE or VERBATIM!
+- should_drop: a boolean value. Set to true if the email is absolutely useless and should be dropped. As my personal secretary, you should be aggressive in dropping emails that are not important.
+  - Drop marketing emails that do not contain a specific, valuable deal.
+  - Drop requests for surveys or feedback.
+  - Drop social media notifications that don't require any action.
+  - Drop emails with no content, like blank emails or emails with only unparsable images.
+  - Do NOT drop promotional emails that provide a specific deal or coupon.
 
 Ensure your response matches the provided JSON schema structure exactly.
 `
