@@ -1,7 +1,21 @@
-export type EmailCategory = 'flight' | 'train' | 'transportation' | 'hotel' | 'show' | 'event' |
-  'transaction' | 'promotion' | 'legal' | 'verification' | 'newsletter' |
-  'tracking' | 'notification' | 'cyber_security' | 'scam' | 'offer' |
-  'actionable' | 'other';
+export type EmailCategory =
+  | 'flight'
+  | 'stay'
+  | 'train'
+  | 'transportation'
+  | 'experience'
+  | 'event'
+  | 'bill'
+  | 'promotion'
+  | 'legal'
+  | 'verification'
+  | 'newsletter'
+  | 'tracking'
+  | 'notification'
+  | 'scam'
+  | 'offer'
+  | 'actionable'
+  | 'other';
 
 export interface TriageInfo {
   category: EmailCategory;
