@@ -22,6 +22,7 @@ const program = TJS.getProgramFromFiles(
     path.resolve("src/types/hotel.ts"),
     path.resolve("src/types/basicCalendarEvent.ts"),
     path.resolve("src/types/promotion.ts"),
+    path.resolve("src/types/notification.ts"),
   ],
   compilerOptions
 );
@@ -35,6 +36,7 @@ const schemas = {
   "BasicCalendarEventSchema": TJS.generateSchema(program, "BasicCalendarEvent", settings),
   "HotelSchema": TJS.generateSchema(program, "HotelStay", settings),
   "PromotionSchema": TJS.generateSchema(program, "PromotionDetails", settings),
+  "NotificationSchema": TJS.generateSchema(program, "NotificationInfo", settings),
 };
 
 const schemasDir = path.resolve("src/schemas");
