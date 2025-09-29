@@ -37,6 +37,7 @@ const schemas = {
   "HotelSchema": TJS.generateSchema(program, "HotelStay", settings),
   "PromotionSchema": TJS.generateSchema(program, "PromotionDetails", settings),
   "NotificationSchema": TJS.generateSchema(program, "NotificationInfo", settings),
+  "LegalSchema": TJS.generateSchema(program, "LegalDetails", settings),
 };
 
 const schemasDir = path.resolve("src/schemas");
