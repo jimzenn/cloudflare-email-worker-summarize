@@ -23,6 +23,7 @@ const program = TJS.getProgramFromFiles(
     path.resolve("src/types/basicCalendarEvent.ts"),
     path.resolve("src/types/promotion.ts"),
     path.resolve("src/types/notification.ts"),
+    path.resolve("src/types/legal.ts"),
   ],
   compilerOptions
 );
