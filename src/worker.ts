@@ -17,6 +17,11 @@ export default {
       const { triageInfo, debugInfo: triageDebugInfo } = await triageEmail(email, env);
       debugInfo = { ...triageDebugInfo, startTime, messageId: message.headers.get('Message-ID') ?? undefined };
 
+      if (triageInfo.shouldDrop) {
+        console.log(`[Worker] Dropping email: ${email.subject || '(No subject)'}`);
+        return;
+      }
+
       const category = triageInfo.category;
       const domainKnowledges = triageInfo.domainKnowledge;
 

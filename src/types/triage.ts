@@ -7,5 +7,6 @@ export interface TriageInfo {
   category: EmailCategory;
   domainKnowledge: string[];
   cleanedEmailBody: string;
+  shouldDrop: boolean;
 }
 
