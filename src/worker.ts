@@ -22,7 +22,7 @@ export default {
 
       console.log(`[Triage] ${email.subject || '(No subject)'} → ${JSON.stringify(triageInfo)}`);
 
-      email.text = triageInfo.cleaneEmailBody;
+      email.text = triageInfo.cleanedEmailBody;
 
       await dispatchToHandler(email, category, domainKnowledges, debugInfo, env);
     } catch (error) {

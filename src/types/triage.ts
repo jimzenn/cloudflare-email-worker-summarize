@@ -6,6 +6,6 @@ export type EmailCategory = 'flight' | 'train' | 'transportation' | 'hotel' | 's
 export interface TriageInfo {
   category: EmailCategory;
   domainKnowledge: string[];
-  cleaneEmailBody: string;
+  cleanedEmailBody: string;
 }
 
