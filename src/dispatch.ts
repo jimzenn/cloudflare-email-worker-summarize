@@ -9,6 +9,7 @@ import { NotificationHandler } from "@/handlers/notification";
 import { PromotionHandler } from "@/handlers/promotion";
 import { DebugInfo } from "@/types/debug";
 import { HandlerConstructor } from "@/types/handler";
+import { LegalHandler } from "@/handlers/legal";
 
 const handlerMap: Record<string, HandlerConstructor[]> = {
   flight: [FlightHandler],
@@ -17,6 +18,7 @@ const handlerMap: Record<string, HandlerConstructor[]> = {
   hotel: [HotelHandler],
   promotion: [PromotionHandler],
   notification: [NotificationHandler],
+  legal: [LegalHandler],
   default: [SummarizeHandler],
 } as const;
 

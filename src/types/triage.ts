@@ -1,5 +1,5 @@
 export type EmailCategory = 'flight' | 'train' | 'transportation' | 'hotel' | 'show' | 'event' |
-  'transaction' | 'promotion' | 'policy_change' | 'verification' | 'newsletter' |
+  'transaction' | 'promotion' | 'legal' | 'verification' | 'newsletter' |
   'tracking' | 'notification' | 'cyber_security' | 'scam' | 'offer' |
   'actionable' | 'other';
 
