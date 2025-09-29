@@ -19,7 +19,7 @@ For each email, provide:
   - "event" (e.g. medical appointment, doctor appointment, meeting, etc.)
   - "bill" (e.g. payments, purchase, invoice, receipt, bill, payment request, venmo, zelle, transactions, etc.)
   - "promotion" (e.g. promotion offer, discount, etc.)
-  - "policy_change" (e.g. terms of service, privacy policy, etc.)
+  - "legal" (e.g. terms of service, privacy policy, etc.)
   - "verification" (e.g. verification code, etc.)
   - "newsletter" (e.g. news, newsletter, etc.)
   - "tracking" (e.g. shipped, delivery, order status, etc.)
