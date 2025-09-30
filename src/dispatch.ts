@@ -44,6 +44,8 @@ export async function dispatchToHandler(
 
   const handlers = handlerMap[category] ?? handlerMap.default;
 
+  console.log(`[📨Dispatcher] Using handlers: ${handlers.map((h) => h.name).join(', ')}`);
+
   await Promise.all(
     handlers.map(async (HandlerClass) => {
       const handler = new HandlerClass(email, domainKnowledge, debugInfo, env);

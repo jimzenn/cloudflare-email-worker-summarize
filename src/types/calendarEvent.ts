@@ -1,20 +1,13 @@
 // https://developers.google.com/calendar/api/v3/reference/events
 
+import { EventDateTime } from "./calendar";
+
 export interface CalendarEvent {
   summary: string;
   description?: string;
   location?: string;
-  colorId?: string;
-  start: {
-    date?: string;  // Date-only (YYYY-MM-DD)
-    dateTime?: string;  // Full date/time in RFC3339
-    timeZone?: string;
-  };
-  end: {
-    date?: string;  // Date-only (YYYY-MM-DD)
-    dateTime?: string;  // Full date/time in RFC3339
-    timeZone?: string;
-  };
+  start: EventDateTime;
+  end: EventDateTime;
   recurrence?: string[];  // RRULE, EXRULE, RDATE and EXDATE entries
   attendees?: Array<{
     email: string;

@@ -10,25 +10,44 @@ import { SummarizeResponse } from "@/types/summarize";
 import { DebugInfo } from "@/types/debug";
 
 export class SummarizeHandler implements Handler {
-  constructor(private email: Email, private domainKnowledges: string[], private debugInfo: DebugInfo, private env: Env) { }
+  constructor(
+    private email: Email,
+    private domainKnowledges: string[],
+    private debugInfo: DebugInfo,
+    private env: Env
+  ) { }
 
   async handle() {
-    console.log(`[Summarize] Handling ${this.email.subject || '(No subject)'}`);
-    
-    const { response, model } = await queryGemini(
-      PROMPT_SUMMARIZE_MARKDOWN_V2,
-      await createEmailPrompt(this.email, this.env),
-      this.env,
-      SummarizeSchema,
-      "SummarizeResponse"
-    );
+    const subject = this.email.subject || '(No subject)';
+    console.log(`[Summarize] Handling email: "${subject}"`);
 
-    const parsed: SummarizeResponse = JSON.parse(response);
-    const summary = parsed.summary;
-    const summarizedTitle = parsed.summarized_title;
+    try {
+      const { response, model } = await queryGemini(
+        PROMPT_SUMMARIZE_MARKDOWN_V2,
+        await createEmailPrompt(this.email, this.env),
+        this.env,
+        SummarizeSchema,
+        "SummarizeResponse"
+      );
 
-    this.debugInfo.llmModel = model;
+      const parsed: SummarizeResponse = JSON.parse(response);
+      const summary = parsed.summary;
+      const summarizedTitle = parsed.summarized_title;
 
-    await sendTelegramMessage(stylizedFullSender(this.email), summarizedTitle, summary, this.debugInfo, this.env);
+      this.debugInfo.llmModel = model;
+
+      await sendTelegramMessage(
+        stylizedFullSender(this.email),
+        summarizedTitle,
+        summary,
+        this.debugInfo,
+        this.env
+      );
+
+      console.log(`[Summarize] Successfully handled email: "${subject}"`);
+    } catch (error) {
+      console.error(`[Summarize] Error handling email: "${subject}"`, error);
+      throw error;
+    }
   }
 }

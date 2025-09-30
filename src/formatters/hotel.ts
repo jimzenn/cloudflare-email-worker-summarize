@@ -1,7 +1,7 @@
 import { HotelStay } from "@/types/hotel";
 import { currencySymbol } from "@/utils/currency";
 import { markdownv2 as format } from 'telegram-format';
-import { DIVIDER } from "@/formatters/common";
+import { DIVIDER, formatList } from "@/formatters/common";
 
 export function formatHotelStay(stay: HotelStay) {
   const header = [
@@ -26,13 +26,15 @@ export function formatHotelStay(stay: HotelStay) {
     );
   }
 
-  const notes = stay.additionalNotes?.length > 0
-    ? [
+  const messageParts = [...header];
+
+  if (stay.additionalNotes && stay.additionalNotes.length > 0) {
+    messageParts.push(
       DIVIDER,
       format.bold('Additional Notes:'),
-      ...stay.additionalNotes.map(note => `• ${note}`)
-    ]
-    : [];
+      formatList(stay.additionalNotes)
+    );
+  }
 
-  return [...header, ...notes].join('\n');
+  return messageParts.join('\n');
 }
