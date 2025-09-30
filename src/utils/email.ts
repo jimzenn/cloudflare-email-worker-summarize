@@ -1,6 +1,5 @@
 import { type Address, type Email } from 'postal-mime';
 import { type Env } from '@/types/env';
-import { replaceWithShortenedUrls } from '@/utils/link';
 import { markdownv2 as format } from 'telegram-format';
 import { escapeMarkdownV2 } from '@/services/telegram';
 
@@ -29,7 +28,6 @@ export function getRawSender(email: Email): string {
 
 export async function createEmailPrompt(email: Email, env: Env): Promise<string> {
   const cleanText = removeRepeatedEmptyLines(email.text || '');
-  const shortenedText = await replaceWithShortenedUrls(cleanText, env);
 
   const userPromptLines = [`Subject: ${email.subject}`, `From: ${getRawSender(email)}`];
 
@@ -40,7 +38,7 @@ export async function createEmailPrompt(email: Email, env: Env): Promise<string>
     }
   }
 
-  userPromptLines.push(shortenedText);
+  userPromptLines.push(cleanText);
 
   return userPromptLines.join('\n');
 }
