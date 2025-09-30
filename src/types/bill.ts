@@ -7,8 +7,8 @@ export type BillInfo = {
   bill_date: string;
   bill_amount: number;
   bill_currency: string;
-  card_last4: string;
   what_for: string;
-  additional_notes: string[];
-  calendar_event: BasicCalendarEvent;
+  card_last4?: string;
+  additional_notes?: string[];
+  calendar_event?: BasicCalendarEvent;
 };

@@ -1,5 +1,12 @@
 import { Env } from '@/types/env';
 
+export class LinkUtilError extends Error {
+  constructor(message: string, public readonly cause?: unknown) {
+    super(message);
+    this.name = 'LinkUtilError';
+  }
+}
+
 const SHORTIO_API_URL = 'https://api.short.io/links';
 const SLUG_HASH_LENGTH = 4;
 const MIN_URL_LENGTH_TO_RESOLVE = 80;
@@ -15,33 +22,26 @@ function generateSlug(url: string): string {
   try {
     const hostname = new URL(url).hostname;
     const domainParts = hostname.split('.').slice(-2);
-    const domain = domainParts.join('.')
-      .replace(/\./g, '-')
-      .replace(/[^a-z0-9-]/gi, '');
+    const domain = domainParts.join('.').replace(/\./g, '-').replace(/[^a-z0-9-]/gi, '');
 
-    // Create a deterministic hash based on the full URL
     let hash = 0;
     for (let i = 0; i < url.length; i++) {
       const char = url.charCodeAt(i);
       hash = ((hash << 5) - hash) + char;
-      hash = hash & hash; // Convert to 32-bit integer
+      hash = hash & hash;
     }
 
-    // Convert the hash to a base36 string and take last SLUG_HASH_LENGTH characters
     const hashString = Math.abs(hash).toString(36).toLowerCase();
     const finalHash = hashString.slice(-SLUG_HASH_LENGTH);
 
     return `${domain}_${finalHash}`;
   } catch (error) {
-    throw new Error(`Invalid URL for slug generation: ${url}`);
+    throw new LinkUtilError(`Invalid URL for slug generation: ${url}`, error);
   }
 }
 
 function extractUrls(text: string): string[] {
-  // Custom regex that excludes <, >, [, and ] from all URL components
   const urlRegex = /https?:\/\/(?:[^\s/?#<>\[\]]+\.)+[^\s/?#<>\[\]]+(?:\/[^\s?#<>\[\]]*)*(?:\?[^\s#<>\[\]]*)?(?:#[^\s<>\[\]]*)?/gi;
-
-  // Match URLs and filter out localhost
   return (text.match(urlRegex) || []).filter(url => {
     try {
       const parsed = new URL(url);
@@ -53,7 +53,7 @@ function extractUrls(text: string): string[] {
 }
 
 export async function shortenUrl(url: string, env: Env): Promise<string> {
-  console.log('shortening', url);
+  console.log('[Link] Shortening', url);
   try {
     const slug = generateSlug(url);
     const response = await fetch(SHORTIO_API_URL, {
@@ -61,68 +61,73 @@ export async function shortenUrl(url: string, env: Env): Promise<string> {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'Authorization': env.SHORTIO_API_KEY
+        'Authorization': env.SHORTIO_API_KEY,
       },
       body: JSON.stringify({
         domain: env.SHORTIO_DOMAIN,
         originalURL: url,
         path: slug,
-        allowDuplicates: false
-      })
+        allowDuplicates: false,
+      }),
     });
 
+    if (!response.ok) {
+      const errorBody = await response.json().catch(() => response.text());
+      throw new LinkUtilError(`Failed to shorten URL: ${response.statusText}`, errorBody);
+    }
+
     const data: ShortenResponse = await response.json();
-    return data.shortURL || data.secureShortURL || url;
+    return data.secureShortURL || data.shortURL || url;
   } catch (error) {
-    console.error('URL shortening failed:', error);
+    const message = error instanceof Error ? error.message : 'An unknown error occurred';
+    console.error(`[Link] URL shortening failed for ${url}: ${message}`, error);
     return url;
   }
 }
 
 async function resolveUrlToFinal(url: string): Promise<string> {
+  console.log(`[Link] Resolving URL: ${url}`);
   try {
     let currentUrl = url;
     let redirectCount = 0;
-    const maxRedirects = 5; // Safe maximum to prevent infinite loops
+    const maxRedirects = 5;
     const visitedUrls = new Set<string>();
 
     while (redirectCount < maxRedirects) {
-      // Check for redirect loops
       if (visitedUrls.has(currentUrl)) {
-        console.warn(`Detected redirect loop for ${url}`);
+        console.warn(`[Link] Detected redirect loop for ${url}`);
         return currentUrl;
       }
       visitedUrls.add(currentUrl);
 
       const response = await fetch(currentUrl, {
-        method: 'HEAD', // Faster than GET for redirect checking
-        redirect: 'manual', // We'll handle redirects ourselves
+        method: 'HEAD',
+        redirect: 'manual',
         headers: {
           'User-Agent': 'Mozilla/5.0 (compatible; URL-resolver/1.0)',
-          'Accept': '*/*'
-        }
+          'Accept': '*/*',
+        },
       });
 
-      // Check various redirect methods
-      const nextUrl = response.headers.get('location') ||
+      const nextUrl =
+        response.headers.get('location') ||
         response.headers.get('content-location') ||
         response.headers.get('refresh')?.split(/url=(.+)/i)[1]?.trim();
 
       if (!nextUrl || (response.status >= 200 && response.status < 300)) {
-        // No more redirects or successful response
-        console.log('resolved: ', currentUrl);
+        console.log(`[Link] Resolved ${url} to: ${currentUrl}`);
         return currentUrl;
       }
 
-      // Resolve relative URLs
       currentUrl = new URL(nextUrl, currentUrl).toString();
       redirectCount++;
     }
 
-    console.warn(`Max redirects (${maxRedirects}) reached for ${url}`);
+    console.warn(`[Link] Max redirects (${maxRedirects}) reached for ${url}`);
     return currentUrl;
   } catch (error) {
-    console.error(`Failed to resolve URL ${url}:`, error);
+    const message = error instanceof Error ? error.message : 'An unknown error occurred';
+    console.error(`[Link] Failed to resolve URL ${url}: ${message}`, error);
     return url;
   }
 }
@@ -132,36 +137,41 @@ export async function replaceWithShortenedUrls(text: string, env: Env): Promise<
     return text;
   }
 
-  const urls = extractUrls(text);
-  const finalUrls = new Set<string>();
+  const urls = [...new Set(extractUrls(text))];
+  const longUrls = urls.filter(url => url.length > MIN_URL_LENGTH_TO_RESOLVE);
 
-  const longUrls = [...finalUrls].filter(url => url.length > MIN_URL_LENGTH_TO_RESOLVE);
-
-  if (longUrls.length > MAX_URL_SHORTENS) {
-    console.warn(`Too many URLs (${longUrls.length}) to shorten, skipping`);
-    for (const url of longUrls) {
-      text = text.replace(url, URL_PLACEHOLDER);
-    }
+  if (longUrls.length === 0) {
     return text;
   }
 
-  // Resolve all long URLs to their final form
-  await Promise.all(longUrls.map(async (url) => {
-    const finalUrl = await resolveUrlToFinal(url);
-    finalUrls.add(finalUrl);
-  }));
-
-  const shortUrls = await Promise.all(longUrls.map(async (url) => {
-    return await shortenUrl(url, env);
-  }));
-
-  const urlMap = new Map<string, string>();
-  for (let i = 0; i < longUrls.length; i++) {
-    urlMap.set(longUrls[i], shortUrls[i]);
+  if (longUrls.length > MAX_URL_SHORTENS) {
+    console.warn(`[Link] Too many URLs (${longUrls.length}) to shorten, replacing with placeholder`);
+    let modifiedText = text;
+    for (const url of longUrls) {
+      modifiedText = modifiedText.split(url).join(URL_PLACEHOLDER);
+    }
+    return modifiedText;
   }
 
-  return urls.reduce(
-    (text, url) => text.split(url).join(urlMap.get(url)!),
-    text
+  const urlMap = new Map<string, string>();
+  await Promise.all(
+    longUrls.map(async originalUrl => {
+      const finalUrl = await resolveUrlToFinal(originalUrl);
+      const shortUrl = await shortenUrl(finalUrl, env);
+      if (shortUrl !== finalUrl) {
+        urlMap.set(originalUrl, shortUrl);
+      }
+    })
   );
+
+  if (urlMap.size === 0) {
+    return text;
+  }
+
+  let modifiedText = text;
+  for (const [originalUrl, shortUrl] of urlMap.entries()) {
+    modifiedText = modifiedText.split(originalUrl).join(shortUrl);
+  }
+
+  return modifiedText;
 }

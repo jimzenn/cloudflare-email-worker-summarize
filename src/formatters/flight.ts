@@ -2,7 +2,7 @@ import { markdownv2 as format } from 'telegram-format';
 import { FlightTrip, FlightItinerary, FlightSegment } from '@/types/flight';
 import { formatDateTime, formatDuration } from '@/utils/datetime';
 import { CalendarEvent } from '@/types/calendarEvent';
-import { DIVIDER } from "@/formatters/common";
+import { DIVIDER, formatList } from "@/formatters/common";
 
 function flightAwareUrl(flightNumber: string) {
   return `https://flightaware.com/live/flight/${flightNumber}`;
@@ -62,17 +62,18 @@ export function formatFlightItinerary(f: FlightItinerary) {
   const header = [
     `Passenger: ${format.bold(f.passengerName)}`,
     `${format.italic(f.trips[0].flightClass)}`,
-    `Confirmation Code: ${format.bold(format.monospace(f.trips[0].confirmation_code))}`,
+    `Confirmation Code: ${format.bold(format.monospace(f.trips[0].confirmationCode))}`,
     ''
   ];
 
   const trips = f.trips.map(formatFlightTrip);
+  const messageParts = [...header, ...trips];
 
-  const notes = f.additionalNotes
-    ? [DIVIDER, format.bold('Additional Notes:'), ...f.additionalNotes.map(note => `- ${note}`)]
-    : [];
+  if (f.additionalNotes && f.additionalNotes.length > 0) {
+    messageParts.push(DIVIDER, format.bold('Additional Notes:'), formatList(f.additionalNotes));
+  }
 
-  return [...header, ...trips, ...notes].join('\n');
+  return messageParts.join('\n');
 }
 
 function formatCalendarEventDescription(segment: FlightSegment, passengerName: string): string {

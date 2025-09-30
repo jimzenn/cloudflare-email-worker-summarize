@@ -14,34 +14,9 @@ export default {
    */
   async email(message: ForwardableEmailMessage, env: Env, ctx: ExecutionContext): Promise<void> {
     const startTime = Date.now();
-    let debugInfo: DebugInfo = {};
 
     try {
-      const email = await PostalMime.parse(message.raw);
-      const subject = email.subject || '(No subject)';
-
-      console.log(`📥 From: ${email.from.address}, Subject: "${subject}"`);
-
-      const { triageInfo, debugInfo: triageDebugInfo } = await triageEmail(email, env);
-      debugInfo = {
-        ...triageDebugInfo,
-        startTime,
-        messageId: message.headers.get('Message-ID') ?? undefined,
-      };
-
-      if (triageInfo.shouldDrop) {
-        console.log(`[Worker] Dropping email: ${subject}`);
-        return;
-      }
-
-      const { category, domainKnowledge, cleanedEmailBody } = triageInfo;
-
-      console.log(`[Triage] ${subject} → ${JSON.stringify(triageInfo)}`);
-
-      // Use the cleaned email body from the triage result.
-      email.text = cleanedEmailBody;
-
-      await dispatchToHandler(email, category, domainKnowledge, debugInfo, env);
+      await this.handleEmail(message, env, startTime);
     } catch (error) {
       this.handleError(error);
       throw error;
@@ -51,21 +26,47 @@ export default {
     }
   },
 
+  async handleEmail(message: ForwardableEmailMessage, env: Env, startTime: number): Promise<void> {
+    const email = await PostalMime.parse(message.raw);
+    const subject = email.subject || '(No subject)';
+
+    console.log(`📥 From: ${email.from.address}, Subject: "${subject}"`);
+
+    const { triageInfo, debugInfo: triageDebugInfo } = await triageEmail(email, env);
+    const debugInfo: DebugInfo = {
+      ...triageDebugInfo,
+      startTime,
+      messageId: message.headers.get('Message-ID') ?? undefined,
+    };
+
+    if (triageInfo.shouldDrop) {
+      console.log(`[Worker] Dropping email: ${subject}`);
+      return;
+    }
+
+    const { category, domainKnowledge, cleanedEmailBody } = triageInfo;
+
+    console.log(`[Triage] ${subject} → ${JSON.stringify(triageInfo)}`);
+
+    // Use the cleaned email body from the triage result.
+    email.text = cleanedEmailBody;
+
+    await dispatchToHandler(email, category, domainKnowledge, debugInfo, env);
+  },
+
   /**
    * Handles errors that occur during email processing.
    * @param error The error that occurred.
    */
   handleError(error: unknown): void {
     if (error instanceof TriageError) {
-      console.error('Triage failed:', {
-        message: error.message,
+      console.error(`Triage failed: ${error.message}`, {
         response: error.response,
         stack: error.stack,
       });
     } else if (error instanceof Error) {
-      console.error('Email processing failed:', {
+      console.error(`Email processing failed: ${error.message}`, {
         name: error.name,
-        message: error.message,
         stack: error.stack,
         cause: error.cause,
       });

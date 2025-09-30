@@ -30,6 +30,9 @@ export async function triageEmail(
   env: Env,
 ): Promise<{ triageInfo: TriageInfo; debugInfo: DebugInfo }> {
   const userPrompt = await createEmailPrompt(email, env);
+
+  console.log('[Triage] User prompt:', userPrompt);
+
   const { response, model } = await queryLLM(PROMPT_TRIAGE, userPrompt, env, TriageSchema, 'TriageInfo');
 
   try {

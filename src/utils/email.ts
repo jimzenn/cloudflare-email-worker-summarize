@@ -13,15 +13,31 @@ export function removeRepeatedEmptyLines(text: string): string {
   return text.replace(/(\n\s*){3,}/g, '\n\n');
 }
 
+function getRawAddress(address: Address): string {
+  if (!address.address) {
+    return '';
+  }
+  if (!address.name || address.name === address.address) {
+    return address.address;
+  }
+  return `${address.name} <${address.address}>`;
+}
+
+export function getRawSender(email: Email): string {
+  return getRawAddress(email.from) || '(Unknown Sender)';
+}
+
 export async function createEmailPrompt(email: Email, env: Env): Promise<string> {
   const cleanText = removeRepeatedEmptyLines(email.text || '');
   const shortenedText = await replaceWithShortenedUrls(cleanText, env);
 
-  const userPromptLines = [`Subject: ${email.subject}`, `From: ${stylizedFullSender(email)}`];
+  const userPromptLines = [`Subject: ${email.subject}`, `From: ${getRawSender(email)}`];
 
   if (email.to && email.to.length > 0) {
-    const toRecipients = email.to.map((to: Address) => `${to.name} <${to.address}>`).join(', ');
-    userPromptLines.push(`To: ${toRecipients}`);
+    const toRecipients = email.to.map(getRawAddress).filter(Boolean).join(', ');
+    if (toRecipients) {
+      userPromptLines.push(`To: ${toRecipients}`);
+    }
   }
 
   userPromptLines.push(shortenedText);
