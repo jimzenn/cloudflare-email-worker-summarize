@@ -1,7 +1,10 @@
-import { queryOpenAI } from '@/services/openai';
-import { queryGemini } from '@/services/gemini';
-import { queryDeepSeek } from '@/services/deepseek';
 import { Env } from '@/types/env';
+import { BaseChatModel } from '@langchain/core/language_models/chat_models';
+import { ChatPromptTemplate } from '@langchain/core/prompts';
+import { ChatOpenAI } from '@langchain/openai';
+import { ChatGoogleGenerativeAI } from '@langchain/google-genai';
+import { ChatDeepSeek } from '@langchain/deepseek';
+import { type JsonSchema } from '@langchain/core/utils/json_schema';
 
 export class LLMError extends Error {
   constructor(message: string, public readonly cause?: unknown) {
@@ -10,71 +13,81 @@ export class LLMError extends Error {
   }
 }
 
-export class LLMTimeoutError extends LLMError {
-  constructor(timeoutMs: number) {
-    super(`Request timed out after ${timeoutMs}ms`);
-    this.name = 'LLMTimeoutError';
-  }
-}
-
-export async function makeAPIRequest<T>(
-  provider: string,
-  url: string,
-  options: RequestInit,
-  timeoutMs: number = 600000 // 10 minutes
-): Promise<T> {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => {
-    console.log(`[🤖${provider}] Request timed out after ${timeoutMs}ms`);
-    controller.abort();
-    throw new LLMTimeoutError(timeoutMs);
-  }, timeoutMs);
-  const startTime = Date.now();
-
-  console.log(`[🤖${provider}] Request starting...`);
-
-  const heartbeatInterval = setInterval(() => {
-    const elapsedTime = Date.now() - startTime;
-    console.log(`[🤖${provider}] Request in progress... ${elapsedTime / 1000}s elapsed`);
-  }, 5000);
-
-  try {
-    let response: Response;
-    response = await fetch(url, {
-      ...options,
-      signal: controller.signal,
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new LLMError(`API returned ${response.status}: ${errorText}`);
-    }
-
-    return await response.json();
-  } finally {
-    clearInterval(heartbeatInterval);
-    clearTimeout(timeoutId);
-    console.log(`[🤖${provider}] Request completed in ${((Date.now() - startTime) / 1000).toFixed(2)}s`);
-  }
-}
-
 export async function queryLLM(
   systemPrompt: string,
   userPrompt: string,
   env: Env,
-  schema: object,
+  schema: JsonSchema,
   schemaName: string,
   reasoning: boolean = false,
   provider: 'openai' | 'gemini' | 'deepseek' = 'gemini',
-  temperature: number = 0.7,
+  temperature: number = 0.7
 ): Promise<{ response: string; model: string }> {
-  if (provider === 'openai') {
-    return queryOpenAI(systemPrompt, userPrompt, env, schema, schemaName, reasoning, temperature);
-  } else if (provider === 'gemini') {
-    return queryGemini(systemPrompt, userPrompt, env, schema, schemaName, reasoning, temperature);
-  } else if (provider === 'deepseek') {
-    return queryDeepSeek(systemPrompt, userPrompt, env, schema, schemaName, reasoning, temperature);
-  } else {
-    throw new Error(`Unsupported provider: ${provider}`);
+  let model: BaseChatModel;
+  let modelName: string;
+
+  try {
+    switch (provider) {
+      case 'openai':
+        modelName = reasoning ? env.OPENAI_REASONING_MODEL : env.OPENAI_MODEL;
+        if (!env.OPENAI_API_KEY) throw new LLMError('OPENAI_API_KEY is not set');
+        model = new ChatOpenAI({
+          apiKey: env.OPENAI_API_KEY,
+          model: modelName,
+          temperature,
+        });
+        break;
+      case 'gemini':
+        modelName = reasoning ? env.GEMINI_REASONING_MODEL : env.GEMINI_MODEL;
+        if (!env.GEMINI_API_KEY) throw new LLMError('GEMINI_API_KEY is not set');
+        model = new ChatGoogleGenerativeAI({
+          apiKey: env.GEMINI_API_KEY,
+          model: modelName,
+          temperature,
+        });
+        break;
+      case 'deepseek':
+        modelName = reasoning ? env.DEEPSEEK_REASONING_MODEL : env.DEEPSEEK_MODEL;
+        if (!env.DEEPSEEK_API_KEY) throw new LLMError('DEEPSEEK_API_KEY is not set');
+        model = new ChatDeepSeek({
+          apiKey: env.DEEPSEEK_API_KEY,
+          model: modelName,
+          temperature,
+        });
+        break;
+      default:
+        const exhaustiveCheck: never = provider;
+        throw new LLMError(`Unsupported provider: ${exhaustiveCheck}`);
+    }
+
+    const structuredModel = model.withStructuredOutput(schema, {
+      name: schemaName,
+    });
+
+    const prompt = ChatPromptTemplate.fromMessages([
+      ["system", systemPrompt],
+      ["human", "{input}"],
+    ]);
+
+    const chain = prompt.pipe(structuredModel);
+
+    console.log(`[🤖${provider}|${modelName}] Request starting...`);
+    const startTime = Date.now();
+
+    const response = await chain.invoke({ input: userPrompt });
+
+    const elapsedTime = (Date.now() - startTime) / 1000;
+    console.log(`[🤖${provider}|${modelName}] Request completed in ${elapsedTime.toFixed(2)}s`);
+
+    const result = JSON.stringify(response);
+    console.log(`[🤖${provider}|${modelName}] Response: ${result}`);
+
+    return { response: result, model: modelName };
+
+  } catch (error) {
+    const modelNameForError = provider ? (reasoning ? env[`${provider.toUpperCase()}_REASONING_MODEL` as keyof Env] : env[`${provider.toUpperCase()}_MODEL` as keyof Env]) || 'unknown' : 'unknown';
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error(`[🤖${provider}|${modelNameForError}] LLMError: ${errorMessage}`, error);
+    throw new LLMError(`[${provider}] ${errorMessage}`, error);
   }
 }
