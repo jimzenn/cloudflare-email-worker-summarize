@@ -6,9 +6,7 @@ compatibility_flags = ["nodejs_compat"]
 [vars]
 PUSHOVER_API_URL = "https://api.pushover.net/1/messages.json"
 TELEGRAM_TO_CHAT_ID = "-4706038643"
-SHORTIO_DOMAIN = "link.zenn.in"
 EMAIL_ALLOWLIST = "jimzenn0@gmail.com,*@zenn.in,cplusherly@gmail.com"
-ENABLE_LINK_SHORTENING = true
 GOOGLE_CALENDAR_ID = "c_1cdf51574bb6ac183721c99fae8dc7deba72c48fe0e0c7e892f26b6c974cd15c@group.calendar.google.com"
 
 OPENAI_MODEL = "gpt-4o-2024-08-06"
