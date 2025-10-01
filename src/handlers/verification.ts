@@ -1,7 +1,7 @@
 import { PROMPT_EXTRACT_VERIFICATION_CODE } from "@/prompts/verification";
 import VerificationSchema from "@/schemas/VerificationSchema.json";
 import { sendPushoverNotification } from "@/services/pushover";
-import { sendTelegramMessage } from "@/services/telegram";
+import { sendTelegramBrief } from "@/services/telegram";
 import { DebugInfo } from "@/types/debug";
 import { Env } from "@/types/env";
 import { Handler } from "@/types/handler";
@@ -40,9 +40,7 @@ export class VerificationHandler implements Handler {
 
       await Promise.all([
         sendPushoverNotification(title, message, this.env),
-        sendTelegramMessage(
-          stylizedFullSender(this.email),
-          title,
+        sendTelegramBrief(
           message,
           this.debugInfo,
           this.env
