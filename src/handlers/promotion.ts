@@ -61,16 +61,34 @@ export class PromotionHandler implements Handler {
       const message = formatPromotionMessage(analysis);
       const title = `💰 Promotion from ${analysis.vendor}`;
 
-      await Promise.all([
+      const notificationPromises = [
         sendPushoverNotification(title, message, this.env),
-        sendTelegramMessage(
-          stylizedFullSender(this.email),
-          title,
-          message,
-          this.debugInfo,
-          this.env
-        ),
-      ]);
+      ];
+
+      const shouldSendTelegram = analysis.items.some(
+        (item) => item.verdict === 'RECOMMENDED' || item.verdict === 'NEUTRAL'
+      );
+
+      if (shouldSendTelegram) {
+        console.log(
+          '[Promotion] Sending Telegram message because at least one item is RECOMMENDED or NEUTRAL'
+        );
+        notificationPromises.push(
+          sendTelegramMessage(
+            stylizedFullSender(this.email),
+            title,
+            message,
+            this.debugInfo,
+            this.env
+          )
+        );
+      } else {
+        console.log(
+          '[Promotion] Not sending Telegram message because no items are RECOMMENDED or NEUTRAL'
+        );
+      }
+
+      await Promise.all(notificationPromises);
 
       console.log(`[Promotion] Successfully handled email: "${subject}"`);
     } catch (error) {
