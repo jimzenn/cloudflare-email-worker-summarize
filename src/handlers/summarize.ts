@@ -1,7 +1,7 @@
 import { Env } from "@/types/env";
 import { Email } from "postal-mime";
 import { PROMPT_SUMMARIZE_MARKDOWN_V2 } from "@/prompts/actions";
-import { queryGemini } from "@/services/gemini";
+import { queryLLM } from "@/services/llm";
 import { createEmailPrompt, stylizedFullSender } from "@/utils/email";
 import { sendTelegramMessage } from "@/services/telegram";
 import SummarizeSchema from "@/schemas/SummarizeSchema.json";
@@ -22,12 +22,14 @@ export class SummarizeHandler implements Handler {
     console.log(`[Summarize] Handling email: "${subject}"`);
 
     try {
-      const { response, model } = await queryGemini(
+      const { response, model } = await queryLLM(
         PROMPT_SUMMARIZE_MARKDOWN_V2,
         await createEmailPrompt(this.email, this.env),
         this.env,
         SummarizeSchema,
-        "SummarizeResponse"
+        "SummarizeResponse",
+        false, // reasoning
+        'gemini' // provider
       );
 
       const parsed: SummarizeResponse = JSON.parse(response);
