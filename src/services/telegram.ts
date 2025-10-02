@@ -40,7 +40,7 @@ function formatDebugInfo(debugInfo: DebugInfo): string {
   const { llmModel, category, startTime } = debugInfo;
   const executionTime = startTime ? `${(Date.now() - startTime) / 1000.0}s` : 'N/A';
   const parts = [`🤖 ${llmModel}`, `🏷️ ${category}`, `⏱️ ${executionTime}`];
-  return format.monospace(parts.map(escapeMarkdownV2).join(' \\| '));
+  return format.monospace(parts.join(' | '));
 }
 
 function formatMarkdownBrief(text: string, debugInfo?: DebugInfo): string {
