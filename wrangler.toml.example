@@ -1,0 +1,32 @@
+name = "email-worker-summarize"
+main = "src/worker.ts"
+compatibility_date = "2025-02-05"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+# A comma-separated list of email addresses that are allowed to trigger the worker.
+# Wildcards are supported, e.g., *@example.com.
+EMAIL_ALLOWLIST = ""
+
+# The ID of the Google Calendar to which events should be added.
+GOOGLE_CALENDAR_ID = ""
+
+# The model to use for generating summaries and other content.
+# Recommended: "gpt-4o-2024-08-06" or "gemini-2.5-pro"
+OPENAI_MODEL = "gpt-4o-2024-08-06"
+GEMINI_MODEL = "gemini-2.5-pro"
+DEEPSEEK_MODEL = "deepseek-chat"
+
+# The model to use for reasoning tasks, such as determining the email category.
+OPENAI_REASONING_MODEL = "gpt-4o-2024-08-06"
+GEMINI_REASONING_MODEL = "gemini-2.5-pro"
+DEEPSEEK_REASONING_MODEL = "deepseek-reasoner"
+
+# The Pushover API URL for sending notifications.
+PUSHOVER_API_URL = "https://api.pushover.net/1/messages.json"
+
+# The Telegram chat ID to which notifications should be sent.
+TELEGRAM_TO_CHAT_ID = ""
+
+[observability.logs]
+enabled = true
