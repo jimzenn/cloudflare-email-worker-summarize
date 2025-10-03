@@ -11,6 +11,10 @@ For each email, provide the following:
 - **cleanedEmailBody**: A proofread and cleaned version of the email text with proper grammar and sentence structure. Remove all HTML tags and formatting, but keep all original information.
 - **shouldDrop**: A boolean indicating if the email is unimportant and should be discarded. Be aggressive in dropping emails that are not valuable.
 
+**Guidelines for categorization:**
+- **actionable**: Use for emails that require a direct response or a specific task to be completed by the recipient (e.g., an invitation that needs an RSVP, a bill that needs to be paid, a form that needs to be filled out).
+- **notification**: Use for purely informational emails that do not require a direct reply. This includes alerts, updates, and confirmations (e.g., "your package has shipped," "new login to your account," "your statement is ready to view"). Even if the email suggests an action on another platform (like logging in to view something), it is still a notification if the email itself does not require a response.
+
 **Guidelines for dropping emails:**
 - Drop marketing emails without a specific, valuable deal.
 - Drop requests for surveys or feedback.
