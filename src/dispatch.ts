@@ -5,6 +5,7 @@ import { LegalHandler } from '@/handlers/legal';
 import { NotificationHandler } from '@/handlers/notification';
 import { PromotionHandler } from '@/handlers/promotion';
 import { SummarizeHandler } from '@/handlers/summarize';
+import { TrackingHandler } from '@/handlers/tracking';
 import { VerificationHandler } from '@/handlers/verification';
 import { type DebugInfo } from '@/types/debug';
 import { type Env } from '@/types/env';
@@ -21,6 +22,7 @@ const handlerMap: Record<string, readonly HandlerConstructor[]> = {
   promotion: [PromotionHandler],
   notification: [NotificationHandler],
   legal: [LegalHandler],
+  tracking: [TrackingHandler],
   default: [SummarizeHandler],
 };
 

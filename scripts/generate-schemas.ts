@@ -24,6 +24,7 @@ const program = TJS.getProgramFromFiles(
     path.resolve("src/types/promotion.ts"),
     path.resolve("src/types/notification.ts"),
     path.resolve("src/types/legal.ts"),
+    path.resolve("src/types/tracking.ts"),
   ],
   compilerOptions
 );
@@ -39,6 +40,7 @@ const schemas = {
   "PromotionSchema": TJS.generateSchema(program, "PromotionDetails", settings),
   "NotificationSchema": TJS.generateSchema(program, "NotificationInfo", settings),
   "LegalSchema": TJS.generateSchema(program, "LegalDetails", settings),
+  "TrackingSchema": TJS.generateSchema(program, "TrackingInfo", settings),
 };
 
 const schemasDir = path.resolve("src/schemas");
