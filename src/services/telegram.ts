@@ -61,7 +61,7 @@ function formatMarkdownMessage(subject: string, sender: string, text: string, de
   return [
     format.blockquote([format.bold(escapeMarkdownV2(subject)), "from: " + sender].join('\n')),
     text,
-    // debugString,
+    debugString,
   ].join('\n\n');
 }
 
@@ -76,7 +76,7 @@ function formatPlainMessage(subject: string, sender: string, text: string, debug
     '',
     text,
     '',
-    // debugString,
+    debugString,
   ].join('\n');
 }
 
