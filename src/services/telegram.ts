@@ -50,9 +50,8 @@ function formatMarkdownBrief(text: string, debugInfo?: DebugInfo): string {
 
 function formatPlainBrief(text: string, debugInfo?: DebugInfo): string {
   const debugString = debugInfo
-    ? `[Debug: LLM: ${debugInfo.llmModel}, Category: ${debugInfo.category}, Time: ${
-        debugInfo.startTime ? (Date.now() - debugInfo.startTime) / 1000.0 : 'N/A'
-      }s, MessageID: ${debugInfo.messageId}]`
+    ? `[Debug: LLM: ${debugInfo.llmModel}, Category: ${debugInfo.category}, Time: ${debugInfo.startTime ? (Date.now() - debugInfo.startTime) / 1000.0 : 'N/A'
+    }s, MessageID: ${debugInfo.messageId}]`
     : '';
   return [text, '', debugString].join('\n');
 }
@@ -62,17 +61,23 @@ function formatMarkdownMessage(subject: string, sender: string, text: string, de
   return [
     format.blockquote([format.bold(escapeMarkdownV2(subject)), "from: " + sender].join('\n')),
     text,
-    debugString,
+    // debugString,
   ].join('\n\n');
 }
 
 function formatPlainMessage(subject: string, sender: string, text: string, debugInfo?: DebugInfo): string {
   const debugString = debugInfo
-    ? `[Debug: LLM: ${debugInfo.llmModel}, Category: ${debugInfo.category}, Time: ${
-        debugInfo.startTime ? (Date.now() - debugInfo.startTime) / 1000.0 : 'N/A'
-      }s, MessageID: ${debugInfo.messageId}]`
+    ? `[Debug: LLM: ${debugInfo.llmModel}, Category: ${debugInfo.category}, Time: ${debugInfo.startTime ? (Date.now() - debugInfo.startTime) / 1000.0 : 'N/A'
+    }s, MessageID: ${debugInfo.messageId}]`
     : '';
-  return [subject, `from: ${sender}`, '', text, '', debugString].join('\n');
+  return [
+    subject,
+    `from: ${sender}`,
+    '',
+    text,
+    '',
+    // debugString,
+  ].join('\n');
 }
 
 async function send(
