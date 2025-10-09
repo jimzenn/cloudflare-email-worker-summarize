@@ -37,9 +37,8 @@ export function escapeMarkdownV2(text: string): string {
 }
 
 function formatDebugInfo(debugInfo: DebugInfo): string {
-  const { llmModel, category, startTime } = debugInfo;
-  const executionTime = startTime ? `${(Date.now() - startTime) / 1000.0}s` : 'N/A';
-  const parts = [`🤖 ${llmModel}`, `🏷️ ${category}`, `⏱️ ${executionTime}`];
+  const { llmModel, category } = debugInfo;
+  const parts = [`🤖 ${llmModel}`, `🏷️ ${category}`];
   return format.monospace(parts.join(' | '));
 }
 
@@ -50,8 +49,7 @@ function formatMarkdownBrief(text: string, debugInfo?: DebugInfo): string {
 
 function formatPlainBrief(text: string, debugInfo?: DebugInfo): string {
   const debugString = debugInfo
-    ? `[Debug: LLM: ${debugInfo.llmModel}, Category: ${debugInfo.category}, Time: ${debugInfo.startTime ? (Date.now() - debugInfo.startTime) / 1000.0 : 'N/A'
-    }s, MessageID: ${debugInfo.messageId}]`
+    ? `[Debug: LLM: ${debugInfo.llmModel}, Category: ${debugInfo.category}, MessageID: ${debugInfo.messageId}]`
     : '';
   return [text, '', debugString].join('\n');
 }
@@ -67,8 +65,7 @@ function formatMarkdownMessage(subject: string, sender: string, text: string, de
 
 function formatPlainMessage(subject: string, sender: string, text: string, debugInfo?: DebugInfo): string {
   const debugString = debugInfo
-    ? `[Debug: LLM: ${debugInfo.llmModel}, Category: ${debugInfo.category}, Time: ${debugInfo.startTime ? (Date.now() - debugInfo.startTime) / 1000.0 : 'N/A'
-    }s, MessageID: ${debugInfo.messageId}]`
+    ? `[Debug: LLM: ${debugInfo.llmModel}, Category: ${debugInfo.category}, MessageID: ${debugInfo.messageId}]`
     : '';
   return [
     subject,
@@ -127,6 +124,10 @@ async function send(
 }
 
 export async function sendTelegramBrief(text: string, debugInfo: DebugInfo, env: Env): Promise<void> {
+  const { startTime } = debugInfo;
+  if (startTime) {
+    console.log(`[Telegram] Execution time: ${Date.now() - startTime}ms`);
+  }
   const escapedText = escapeMarkdownV2(text);
   const shortenedText = escapedText.slice(0, MAX_TELEGRAM_MESSAGE_LENGTH);
   const formattedMsg = formatMarkdownBrief(shortenedText, debugInfo);
@@ -141,6 +142,10 @@ export async function sendTelegramMessage(
   debugInfo: DebugInfo,
   env: Env
 ): Promise<void> {
+  const { startTime } = debugInfo;
+  if (startTime) {
+    console.log(`[Telegram] Execution time: ${Date.now() - startTime}ms`);
+  }
   const escapedSubject = escapeMarkdownV2(subject);
   const escapedText = escapeMarkdownV2(text);
   const shortenedText = escapedText.slice(0, MAX_TELEGRAM_MESSAGE_LENGTH);
