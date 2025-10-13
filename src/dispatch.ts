@@ -1,4 +1,5 @@
 import { BillHandler } from '@/handlers/bill';
+import { EventHandler } from '@/handlers/event';
 import { FlightHandler } from '@/handlers/flight';
 import { HotelHandler } from '@/handlers/hotel';
 import { LegalHandler } from '@/handlers/legal';
@@ -14,6 +15,7 @@ import { type Email } from 'postal-mime';
 
 const handlerMap: Record<string, readonly HandlerConstructor[]> = {
   flight: [FlightHandler],
+  event: [EventHandler],
   bill: [BillHandler],
   verification: [VerificationHandler],
   hotel: [HotelHandler],
