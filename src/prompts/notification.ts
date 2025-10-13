@@ -11,7 +11,8 @@ Here are some examples of different notification types:
 - **Social Media:** For a new message, "LinkedIn: John Doe sent you a message." For a mention, "X: @user mentioned you in a post."
 - **Calendar Events:** For an upcoming event, "Google Calendar: Event 'Project Deadline' starts in 30 mins."
 - **System Alerts:** For a storage warning, "Google Photos: Your storage is almost full."
+- **Transactions:** For a money transaction, "Venmo: You received $500 from Dee Dong."
 
-Always try to include the name of the service or product the notification is about.
+Always try to include the name of the service or product the notification is about. If there are key numerical values, include them.
 
 Ensure your response matches the provided JSON schema structure exactly.`;
