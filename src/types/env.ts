@@ -16,5 +16,6 @@ export interface Env {
     DEEPSEEK_API_KEY: string;
     DEEPSEEK_MODEL: string;
     DEEPSEEK_REASONING_MODEL: string;
+  EVENT_STORE: KVNamespace;
   }
   

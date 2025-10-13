@@ -2,6 +2,12 @@ import { Env } from '@/types/env';
 import { DebugInfo } from '@/types/debug';
 import { markdownv2 as format } from 'telegram-format';
 
+export interface InlineKeyboardButton {
+  text: string;
+  callback_data?: string;
+  url?: string;
+}
+
 const MAX_TELEGRAM_MESSAGE_LENGTH = 4096;
 const TELEGRAM_API_BASE = 'https://api.telegram.org/bot';
 
@@ -81,15 +87,31 @@ async function send(
   env: Env,
   formattedMsg: string,
   plainMsg: string,
-  logMessage: string
+  logMessage: string,
+  inlineKeyboard?: InlineKeyboardButton[][]
 ): Promise<void> {
   const apiUrl = `${TELEGRAM_API_BASE}${env.TELEGRAM_BOT_TOKEN}/sendMessage`;
   console.log(`[Telegram] Sending ${logMessage}:`, formattedMsg);
 
+  const body: {
+    chat_id: string;
+    text: string;
+    parse_mode?: string;
+    reply_markup?: { inline_keyboard: InlineKeyboardButton[][] };
+  } = {
+    chat_id: env.TELEGRAM_TO_CHAT_ID,
+    text: formattedMsg,
+    parse_mode: 'MarkdownV2',
+  };
+
+  if (inlineKeyboard) {
+    body.reply_markup = { inline_keyboard: inlineKeyboard };
+  }
+
   const response = await fetch(apiUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ chat_id: env.TELEGRAM_TO_CHAT_ID, text: formattedMsg, parse_mode: 'MarkdownV2' }),
+    body: JSON.stringify(body),
   });
 
   if (response.ok) {
@@ -140,7 +162,8 @@ export async function sendTelegramMessage(
   subject: string,
   text: string,
   debugInfo: DebugInfo,
-  env: Env
+  env: Env,
+  inlineKeyboard?: InlineKeyboardButton[]
 ): Promise<void> {
   const { startTime } = debugInfo;
   if (startTime) {
@@ -151,5 +174,5 @@ export async function sendTelegramMessage(
   const shortenedText = escapedText.slice(0, MAX_TELEGRAM_MESSAGE_LENGTH);
   const formattedMsg = formatMarkdownMessage(escapedSubject, sender, shortenedText, debugInfo);
   const plainMsg = formatPlainMessage(subject, sender, text.slice(0, MAX_TELEGRAM_MESSAGE_LENGTH), debugInfo);
-  await send(env, formattedMsg, plainMsg, `message "${subject}"`);
+  await send(env, formattedMsg, plainMsg, `message "${subject}"`, inlineKeyboard ? [inlineKeyboard] : undefined);
 }
