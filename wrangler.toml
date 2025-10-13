@@ -20,3 +20,8 @@ DEEPSEEK_REASONING_MODEL = "deepseek-reasoner"
 
 [observability.logs]
 enabled = true
+
+[[kv_namespaces]]
+binding = "EVENT_STORE"
+id = "temp_id"
+preview_id = "temp_preview_id"
