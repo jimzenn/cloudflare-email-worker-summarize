@@ -22,4 +22,6 @@ DEEPSEEK_REASONING_MODEL = "deepseek-reasoner"
 enabled = true
 
 [[kv_namespaces]]
-binding = "EVENT_STORE"
+binding = "KV"
+id = "962c4ad686554b0fa1ecbb8c2664b3bd"
+preview_id = "temp_preview_id"
