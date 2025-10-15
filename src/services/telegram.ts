@@ -152,8 +152,9 @@ export async function sendTelegramBrief(text: string, debugInfo: DebugInfo, env:
   }
   const escapedText = escapeMarkdownV2(text);
   const shortenedText = escapedText.slice(0, MAX_TELEGRAM_MESSAGE_LENGTH);
-  const formattedMsg = formatMarkdownBrief(shortenedText, debugInfo);
-  const plainMsg = formatPlainBrief(text.slice(0, MAX_TELEGRAM_MESSAGE_LENGTH), debugInfo);
+  const debugEnabled = env.DEBUG_NOTIFICATIONS === 'true';
+  const formattedMsg = formatMarkdownBrief(shortenedText, debugEnabled ? debugInfo : undefined);
+  const plainMsg = formatPlainBrief(text.slice(0, MAX_TELEGRAM_MESSAGE_LENGTH), debugEnabled ? debugInfo : undefined);
   await send(env, formattedMsg, plainMsg, 'brief');
 }
 
