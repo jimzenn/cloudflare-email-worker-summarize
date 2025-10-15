@@ -1,41 +1,22 @@
 import { PROMPT_EXTRACT_NOTIFICATION_INFO } from "@/prompts/notification";
-import NotificationSchema from "@/schemas/NotificationSchema.json";
 import { sendTelegramBrief } from "@/services/telegram";
-import { DebugInfo } from "@/types/debug";
-import { Env } from "@/types/env";
-import { Handler } from "@/types/handler";
-import { NotificationInfo } from "@/types/notification";
-import { extractInformation } from "@/utils/extract";
-import { Email } from "postal-mime";
+import { NotificationInfo, NotificationInfoSchema } from "@/types/zod/notification";
+import { BaseHandler } from "./base";
 
-export class NotificationHandler implements Handler {
-  constructor(
-    private email: Email,
-    private domainKnowledges: string[],
-    private debugInfo: DebugInfo,
-    private env: Env
-  ) { }
+export class NotificationHandler extends BaseHandler<NotificationInfo> {
+  protected schema = NotificationInfoSchema;
+  protected systemPrompt = PROMPT_EXTRACT_NOTIFICATION_INFO;
+  protected handlerName = "Notification";
+  protected actionName = "NotificationInfo";
 
-  async handle() {
-    const subject = this.email.subject || '(No subject)';
-    console.log(`[Notification] Handling email: "${subject}"`);
+  protected async sendMessage(data: NotificationInfo) {
+    await sendTelegramBrief(data.summary, this.debugInfo, this.env);
+  }
 
-    try {
-      const { data: notificationInfo, model } = await extractInformation<NotificationInfo>(
-        this.email,
-        PROMPT_EXTRACT_NOTIFICATION_INFO,
-        NotificationSchema,
-        "NotificationInfo",
-        this.env
-      );
-      this.debugInfo.llmModel = model;
-
-      await sendTelegramBrief(notificationInfo.summary, this.debugInfo, this.env);
-
-      console.log(`[Notification] Successfully handled email: "${subject}"`);
-    } catch (error) {
-      console.error(`[Notification] Error handling email: "${subject}"`, error);
-      throw error;
-    }
+  protected async formatMessage(data: NotificationInfo) {
+    return {
+      title: "",
+      message: data.summary,
+    };
   }
 }
