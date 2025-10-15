@@ -1,24 +1,15 @@
 import { formatFlightCalendarEvent, formatFlightItinerary } from "@/formatters/flight";
 import { PROMPT_EXTRACT_FLIGHT_INFO } from "@/prompts/flight";
-import FlightSchema from "@/schemas/FlightSchema.json";
 import { createCalendarEvent } from "@/services/calendar";
-import { sendTelegramMessage } from "@/services/telegram";
 import { CalendarEvent } from "@/types/calendarEvent";
-import { DebugInfo } from "@/types/debug";
-import { Env } from "@/types/env";
-import { FlightItinerary, FlightSegment } from "@/types/flight";
-import { Handler } from "@/types/handler";
-import { stylizedFullSender } from "@/utils/email";
-import { extractInformation } from "@/utils/extract";
-import { Email } from "postal-mime";
+import { FlightItinerary, FlightItinerarySchema, FlightSegment } from "@/types/zod/flight";
+import { BaseHandler } from "./base";
 
-export class FlightHandler implements Handler {
-  constructor(
-    private email: Email,
-    private domainKnowledges: string[],
-    private debugInfo: DebugInfo,
-    private env: Env
-  ) { }
+export class FlightHandler extends BaseHandler<FlightItinerary> {
+  protected schema = FlightItinerarySchema;
+  protected systemPrompt = PROMPT_EXTRACT_FLIGHT_INFO;
+  protected handlerName = "Flight";
+  protected actionName = "FlightItinerary";
 
   private createFlightCalendarEvent(segment: FlightSegment, passengerName: string): CalendarEvent {
     return formatFlightCalendarEvent(segment, passengerName);
@@ -36,42 +27,17 @@ export class FlightHandler implements Handler {
     await Promise.all(calendarPromises);
   }
 
-  async handle() {
-    const subject = this.email.subject || '(No subject)';
-    console.log(`[Flight] Handling email: "${subject}"`);
+  async formatMessage(flightItinerary: FlightItinerary) {
+    const message = formatFlightItinerary(flightItinerary);
+    const departureCity = flightItinerary.trips[0].segments[0].departureCity;
+    const arrivalCity = flightItinerary.trips[0].segments[flightItinerary.trips[0].segments.length - 1].arrivalCity;
+    const title = `✈️ ${flightItinerary.passengerName}: ${departureCity} ➔ ${arrivalCity}`;
 
-    try {
-      const { data: flightItinerary, model } = await extractInformation<FlightItinerary>(
-        this.email,
-        PROMPT_EXTRACT_FLIGHT_INFO,
-        FlightSchema,
-        "FlightItinerary",
-        this.env
-      );
-      this.debugInfo.llmModel = model;
+    await this.addFlightToCalendar(flightItinerary);
 
-      const message = formatFlightItinerary(flightItinerary);
-      const departureCity = flightItinerary.trips[0].segments[0].departureCity;
-      const arrivalCity = flightItinerary.trips[0].segments[flightItinerary.trips[0].segments.length - 1].arrivalCity;
-      const title = `✈️ ${flightItinerary.passengerName}: ${departureCity} ➔ ${arrivalCity}`;
-
-      console.log('[Flight] Formatted flight itinerary:', message);
-
-      await Promise.all([
-        sendTelegramMessage(
-          stylizedFullSender(this.email),
-          title,
-          message,
-          this.debugInfo,
-          this.env
-        ),
-        this.addFlightToCalendar(flightItinerary)
-      ]);
-
-      console.log(`[Flight] Successfully handled email: "${subject}"`);
-    } catch (error) {
-      console.error(`[Flight] Error handling email: "${subject}"`, error);
-      throw error;
-    }
+    return {
+      title,
+      message,
+    };
   }
 }
