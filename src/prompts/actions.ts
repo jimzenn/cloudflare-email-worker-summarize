@@ -28,7 +28,8 @@ Then,
 - If it is a payment / transaction / flight / hotel / etc.: give me the details in a concise format, short bullet points.
 - If it is an event / ticket / etc.: include bullet points for: name, date, time, location, and other details.
 - Locations must have a Markdown link to Google Maps like http://maps.google.com/?q=location+name .
-- Summarize it in its original language.
+- Summarize it in its original language. However, if the newsletter is in Traditional Chinese, please convert it to Simplified Chinese.
+- When mentioning names of people, countries, or locations, always use their original spellings (e.g., 村上春樹, Joe Biden, 余华). Do not add translations or pronunciations.
 
 Formatting Example:
 
