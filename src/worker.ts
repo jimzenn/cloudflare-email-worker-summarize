@@ -74,7 +74,7 @@ export default {
       messageId: message.headers.get('Message-ID') ?? undefined,
     };
 
-    if (triageInfo.shouldDrop) {
+    if (triageInfo.shouldDrop || triageInfo.category === 'promotion') {
       console.log(`[Worker] Dropping email: ${subject}`);
       return;
     }
