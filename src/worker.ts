@@ -16,7 +16,7 @@ export default {
    * @param env The environment variables.
    * @param ctx The execution context.
    */
-  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+  async fetch(request: Request, env: Env, _ctx: ExecutionContext): Promise<Response> {
     if (request.method === 'POST') {
       try {
         const data: { callback_query?: { data: string, id: string } } = await request.json();
@@ -34,20 +34,24 @@ export default {
     const eventId = callbackQuery.data.split(':')[1];
     const eventData = await env.EVENT_STORE.get(eventId);
 
-    if (eventData) {
-      try {
-        const event: Event = JSON.parse(eventData);
-        const calendarEvent = formatEventToCalendarEvent(event);
-        await createCalendarEvent(calendarEvent, env);
-        await answerCallbackQuery(callbackQuery.id, 'Event added to calendar!', env);
-      } catch (error) {
-        console.error('Error creating calendar event:', error);
-        await answerCallbackQuery(callbackQuery.id, 'Error adding event to calendar.', env);
-      }
+    if (!eventData) {
+      console.warn(`[Worker] KV miss for eventId: ${eventId}`);
+      await answerCallbackQuery(callbackQuery.id, 'Event data not found (may have expired).', env);
+      return;
+    }
+
+    try {
+      const event: Event = JSON.parse(eventData);
+      const calendarEvent = formatEventToCalendarEvent(event);
+      await createCalendarEvent(calendarEvent, env);
+      await answerCallbackQuery(callbackQuery.id, 'Event added to calendar!', env);
+    } catch (error) {
+      console.error('Error creating calendar event:', error);
+      await answerCallbackQuery(callbackQuery.id, 'Error adding event to calendar.', env);
     }
   },
 
-  async email(message: ForwardableEmailMessage, env: Env, ctx: ExecutionContext): Promise<void> {
+  async email(message: ForwardableEmailMessage, env: Env, _ctx: ExecutionContext): Promise<void> {
     const startTime = Date.now();
 
     try {
@@ -75,7 +79,8 @@ export default {
     };
 
     if (triageInfo.shouldDrop || triageInfo.category === 'promotion') {
-      console.log(`[Worker] Dropping email: ${subject}`);
+      const reason = triageInfo.shouldDrop ? 'shouldDrop=true' : `category=${triageInfo.category}`;
+      console.log(`[Worker] Dropped email: "${subject}" | from: ${email.from?.address ?? '(unknown)'} | reason: ${reason}`);
       return;
     }
 

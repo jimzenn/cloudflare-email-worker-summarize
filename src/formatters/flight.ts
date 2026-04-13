@@ -40,10 +40,10 @@ export function formatFlightTrip(f: FlightTrip) {
       format.url(segment.flightNumber, flightAwareUrl(segment.flightNumber));
 
     const segmentLines = [
-      `${format.bold(segment.airlineName)}${flightNumberWithLink ? ` \- ${flightNumberWithLink}` : ''}`,
+      `${format.bold(segment.airlineName)}${flightNumberWithLink ? ` - ${flightNumberWithLink}` : ''}`,
       `${formatPort(segment.departureCity, segment.departureIataCode, segment.departureTerminal, segment.departureGate)} ➔ ` +
       `${formatPort(segment.arrivalCity, segment.arrivalIataCode, segment.arrivalTerminal, segment.arrivalGate)}`,
-      `${departureTime} \- ${arrivalTime}`
+      `${departureTime} - ${arrivalTime}`
     ];
 
     if (!isLastSegment) {

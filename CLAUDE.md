@@ -83,6 +83,31 @@ All LLM calls go through `src/services/llm.ts::queryLLM()`. Default provider is 
 | `GOOGLE_CALENDAR_ID` | Calendar ID for event creation |
 | `DEBUG_NOTIFICATIONS` | Set to `"true"` to include LLM model/category debug info in Telegram messages |
 
+## Local Development
+
+Run locally with `wrangler dev`. Secrets are not in `wrangler.toml` — set them via:
+
+```bash
+# One-time setup for local dev (stored in ~/.config/wrangler/dev-secrets/)
+wrangler secret put GEMINI_API_KEY
+wrangler secret put OPENAI_API_KEY
+wrangler secret put DEEPSEEK_API_KEY
+wrangler secret put TELEGRAM_BOT_TOKEN
+wrangler secret put PUSHOVER_USER_KEY
+wrangler secret put GOOGLE_SERVICE_ACCOUNT_JSON_KEY
+```
+
+Or create a `.dev.vars` file in the project root (gitignored):
+
+```ini
+GEMINI_API_KEY=...
+OPENAI_API_KEY=...
+DEEPSEEK_API_KEY=...
+TELEGRAM_BOT_TOKEN=...
+PUSHOVER_USER_KEY=...
+GOOGLE_SERVICE_ACCOUNT_JSON_KEY=...
+```
+
 ## Stateful Calendar Actions
 
 When an event email is processed, the extracted `Event` object is stored in Cloudflare KV (`EVENT_STORE`) under a UUID. The Telegram message includes an "Add to Calendar" inline button with `callback_data: add_to_calendar:<uuid>`. When clicked, Telegram sends a POST webhook to the worker, which retrieves the event from KV and calls the Google Calendar API.

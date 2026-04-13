@@ -24,12 +24,12 @@ function escapeParenthesesAndBrackets(text: string): string {
   let lastIndex = 0;
 
   for (const match of text.matchAll(linkPattern)) {
-    const beforeLink = text.slice(lastIndex, match.index).replace(/(?<!\\)[\[\]()]/g, '\\$&');
+    const beforeLink = text.slice(lastIndex, match.index).replace(/(?<!\\)[[\]()]/g, '\\$&');
     parts.push(beforeLink);
     parts.push(match[0]);
     lastIndex = (match.index ?? 0) + match[0].length;
   }
-  parts.push(text.slice(lastIndex).replace(/(?<!\\)[\[\]()]/g, '\\$&'));
+  parts.push(text.slice(lastIndex).replace(/(?<!\\)[[\]()]/g, '\\$&'));
   return parts.join('');
 }
 

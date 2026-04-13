@@ -26,7 +26,7 @@ export function getRawSender(email: Email): string {
   return (email.from ? getRawAddress(email.from) : '') || '(Unknown Sender)';
 }
 
-export async function createEmailPrompt(email: Email, env: Env): Promise<string> {
+export async function createEmailPrompt(email: Email, _env: Env): Promise<string> {
   const cleanText = removeRepeatedEmptyLines(email.text || '');
 
   const userPromptLines = [`Subject: ${email.subject}`, `From: ${getRawSender(email)}`];

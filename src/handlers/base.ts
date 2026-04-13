@@ -1,4 +1,4 @@
-import { sendTelegramBrief, sendTelegramMessage, InlineKeyboardButton } from "@/services/telegram";
+import { sendTelegramMessage, InlineKeyboardButton } from "@/services/telegram";
 import { DebugInfo } from "@/types/debug";
 import { Env } from "@/types/env";
 import { Handler } from "@/types/handler";

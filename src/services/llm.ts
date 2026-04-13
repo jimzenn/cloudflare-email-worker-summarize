@@ -55,9 +55,10 @@ export async function queryLLM(
           temperature,
         });
         break;
-      default:
+      default: {
         const exhaustiveCheck: never = provider;
         throw new LLMError(`Unsupported provider: ${exhaustiveCheck}`);
+      }
     }
 
     const structuredModel = model.withStructuredOutput(schema, {
