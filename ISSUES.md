@@ -1,17 +1,13 @@
 # Known Issues
 
-Tracked issues for future work. Last reviewed: 2026-04-13.
-
----
-
-## High Priority
+Last reviewed: 2026-04-13.
 
 ### No tests
-No test framework is configured. The worker has no unit or integration tests. Adding Vitest (which has first-class Cloudflare Workers support via `@cloudflare/vitest-pool-workers`) would catch regressions in handlers, formatters, and utility functions.
+No test framework is configured. Adding Vitest with `@cloudflare/vitest-pool-workers` would provide first-class Cloudflare Workers support and catch regressions in handlers, formatters, and utilities.
 
----
-
-## Medium Priority
-
-### `preview_id` is a placeholder in wrangler.toml
-`preview_id = "temp_preview_id"` under `[[kv_namespaces]]` is a placeholder. A real KV namespace ID for preview/dev environments should be created via `wrangler kv:namespace create EVENT_STORE --preview` and filled in.
+### `preview_id` placeholder in wrangler.toml
+`preview_id = "temp_preview_id"` under `[[kv_namespaces]]` needs a real value. Create one with:
+```bash
+wrangler kv namespace create EVENT_STORE --preview
+```
+Then update `preview_id` in `wrangler.toml` with the returned ID.
