@@ -33,13 +33,13 @@ export async function getGoogleAccessToken(serviceAccount: any): Promise<string>
       }),
     });
 
-    const data = await response.json();
+    const data = await response.json() as Record<string, unknown>;
     if (!response.ok) {
       throw new GoogleAuthError(`Failed to get access token: ${response.statusText}`, data);
     }
 
     console.log('[GoogleAuth] Successfully obtained access token.');
-    return data.access_token;
+    return data['access_token'] as string;
   } catch (error) {
     if (error instanceof GoogleAuthError) {
       throw error;

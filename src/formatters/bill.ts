@@ -1,5 +1,5 @@
 import { markdownv2 as format } from 'telegram-format';
-import { BillInfo } from "@/types/bill";
+import { BillInfo } from "@/types/zod/bill";
 import { currencySymbol } from "@/utils/currency";
 import { DIVIDER } from "@/formatters/common";
 

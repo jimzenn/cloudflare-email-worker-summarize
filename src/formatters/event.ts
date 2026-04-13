@@ -1,5 +1,5 @@
 import { CalendarEvent } from "@/types/calendarEvent";
-import { Event } from "@/types/event";
+import { Event } from "@/types/zod/event";
 import { format } from "date-fns";
 
 export function formatEventToCalendarEvent(event: Event): CalendarEvent {
@@ -7,19 +7,19 @@ export function formatEventToCalendarEvent(event: Event): CalendarEvent {
     summary: event.name,
     location: event.location,
     start: {
-      dateTime: event.startTime,
+      dateTime: event.start_time,
     },
     end: {
-      dateTime: event.endTime || event.startTime,
+      dateTime: event.end_time || event.start_time,
     },
   };
 }
 
 export function formatEvent(event: Event): string {
-  const { name, location, startTime, endTime } = event;
+  const { name, location, start_time, end_time } = event;
 
-  const startDate = new Date(startTime);
-  const endDate = endTime ? new Date(endTime) : null;
+  const startDate = new Date(start_time);
+  const endDate = end_time ? new Date(end_time) : null;
 
   const formattedStartTime = format(startDate, "eee, MMM d, yyyy 'at' h:mm a");
   const formattedEndTime = endDate ? ` - ${format(endDate, "h:mm a")}` : "";

@@ -6,7 +6,7 @@ import { answerCallbackQuery } from '@/services/telegram_answer';
 import { TriageError, triageEmail } from '@/triage';
 import { type DebugInfo } from '@/types/debug';
 import { type Env } from '@/types/env';
-import { Event } from '@/types/event';
+import { Event } from '@/types/zod/event';
 
 export default {
   /**
@@ -65,7 +65,7 @@ export default {
     const email = await PostalMime.parse(message.raw);
     const subject = email.subject || '(No subject)';
 
-    console.log(`📥 From: ${email.from.address}, Subject: "${subject}"`);
+    console.log(`📥 From: ${email.from?.address ?? '(unknown)'}, Subject: "${subject}"`);
 
     const { triageInfo, debugInfo: triageDebugInfo } = await triageEmail(email, env);
     const debugInfo: DebugInfo = {

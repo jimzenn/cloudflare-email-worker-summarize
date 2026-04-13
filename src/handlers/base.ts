@@ -1,4 +1,4 @@
-import { sendTelegramBrief, sendTelegramMessage, TelegramMessageOptions } from "@/services/telegram";
+import { sendTelegramBrief, sendTelegramMessage, InlineKeyboardButton } from "@/services/telegram";
 import { DebugInfo } from "@/types/debug";
 import { Env } from "@/types/env";
 import { Handler } from "@/types/handler";
@@ -81,6 +81,6 @@ export abstract class BaseHandler<T> implements Handler {
   protected abstract formatMessage(data: T): Promise<{
     title: string;
     message: string;
-    options?: TelegramMessageOptions;
+    options?: InlineKeyboardButton[];
   }>;
 }

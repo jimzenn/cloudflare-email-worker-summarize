@@ -15,7 +15,12 @@ export class BillHandler extends BaseHandler<BillInfo> {
     let finalMessage = message;
 
     if (billInfo.calendar_event) {
-      await createCalendarEvent(billInfo.calendar_event, this.env);
+      await createCalendarEvent({
+        summary: billInfo.calendar_event.title,
+        location: billInfo.calendar_event.location,
+        start: { dateTime: billInfo.calendar_event.start_time },
+        end: { dateTime: billInfo.calendar_event.end_time },
+      }, this.env);
       finalMessage += '\n\nReminder added to the Calendar.';
     }
 

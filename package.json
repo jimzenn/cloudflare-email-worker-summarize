@@ -2,26 +2,27 @@
   "type": "module",
   "scripts": {
     "generate-schemas": "tsx --tsconfig scripts/tsconfig.json scripts/generate-schemas.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
     "build": "npm run generate-schemas && wrangler deploy --dry-run",
     "deploy": "npm run generate-schemas && wrangler deploy"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250204.0",
-    "@types/node": "^22.13.4",
-    "tsx": "^3.12.10",
-    "typescript": "^5.9.2",
-    "typescript-json-schema": "^0.65.1",
-    "wrangler": "^4.38.0"
+    "@cloudflare/workers-types": "^4.20260413.1",
+    "@types/node": "^22.19.17",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "typescript-json-schema": "^0.67.1",
+    "wrangler": "^4.82.1"
   },
   "dependencies": {
-    "@langchain/core": "^0.3.78",
-    "@langchain/deepseek": "^0.1.0",
-    "@langchain/google-genai": "^0.2.18",
-    "@langchain/openai": "^0.6.14",
+    "@langchain/core": "^1.1.39",
+    "@langchain/deepseek": "^1.0.24",
+    "@langchain/google-genai": "^2.1.26",
+    "@langchain/openai": "^1.4.4",
     "date-fns": "^4.1.0",
     "date-fns-tz": "^3.2.0",
-    "jose": "^5.9.6",
-    "postal-mime": "^2.4.3",
+    "jose": "^5.10.0",
+    "postal-mime": "^2.7.4",
     "telegram-format": "^3.1.0"
   }
 }

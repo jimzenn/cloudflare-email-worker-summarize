@@ -4,7 +4,7 @@ import { ChatPromptTemplate } from '@langchain/core/prompts';
 import { ChatOpenAI } from '@langchain/openai';
 import { ChatGoogleGenerativeAI } from '@langchain/google-genai';
 import { ChatDeepSeek } from '@langchain/deepseek';
-import { type JsonSchema } from '@langchain/core/utils/json_schema';
+import { z } from 'zod';
 
 export class LLMError extends Error {
   constructor(message: string, public readonly cause?: unknown) {
@@ -17,7 +17,7 @@ export async function queryLLM(
   systemPrompt: string,
   userPrompt: string,
   env: Env,
-  schema: JsonSchema,
+  schema: z.ZodType | Record<string, unknown>,
   schemaName: string,
   reasoning: boolean = false,
   provider: 'openai' | 'gemini' | 'deepseek' = 'gemini',

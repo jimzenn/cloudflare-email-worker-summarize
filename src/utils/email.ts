@@ -23,7 +23,7 @@ function getRawAddress(address: Address): string {
 }
 
 export function getRawSender(email: Email): string {
-  return getRawAddress(email.from) || '(Unknown Sender)';
+  return (email.from ? getRawAddress(email.from) : '') || '(Unknown Sender)';
 }
 
 export async function createEmailPrompt(email: Email, env: Env): Promise<string> {
@@ -44,6 +44,9 @@ export async function createEmailPrompt(email: Email, env: Env): Promise<string>
 }
 
 export function stylizedFullSender(email: Email): string {
+  if (!email.from) {
+    return '(Unknown Sender)';
+  }
   const { name, address } = email.from;
 
   if (!address) {

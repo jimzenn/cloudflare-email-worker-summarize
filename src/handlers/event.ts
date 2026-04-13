@@ -19,9 +19,7 @@ export class EventHandler extends BaseHandler<Event> {
     return {
       title,
       message,
-      options: {
-        inline_keyboard: [[{ text: "Add to Calendar", callback_data: `add_to_calendar:${eventId}` }]],
-      },
+      options: [{ text: "Add to Calendar", callback_data: `add_to_calendar:${eventId}` }],
     };
   }
 }

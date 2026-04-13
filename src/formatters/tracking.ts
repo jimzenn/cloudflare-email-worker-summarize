@@ -10,14 +10,14 @@ export function formatTrackingMessage(trackingInfo: TrackingInfo): { title: stri
   ];
 
   if (trackingInfo.order_url) {
-    messageParts.push(`- Order: ${format.link(format.monospace(trackingInfo.order_id), trackingInfo.order_url)}`);
+    messageParts.push(`- Order: ${format.url(format.monospace(trackingInfo.order_id), trackingInfo.order_url)}`);
   } else {
     messageParts.push(`- Order: ${format.monospace(trackingInfo.order_id)}`);
   }
 
   if (trackingInfo.tracking_number) {
     const trackingUrl = `https://www.17track.net/en/track?nums=${trackingInfo.tracking_number}`;
-    messageParts.push(`- Tracking: ${format.link(format.monospace(trackingInfo.tracking_number), trackingUrl)}`);
+    messageParts.push(`- Tracking: ${format.url(format.monospace(trackingInfo.tracking_number), trackingUrl)}`);
   }
 
   messageParts.push(`- Status: ${format.bold(trackingInfo.status)}`);
@@ -27,7 +27,7 @@ export function formatTrackingMessage(trackingInfo: TrackingInfo): { title: stri
   const destination = `${trackingInfo.destination_city}, ${trackingInfo.destination_state}`;
   const destinationQuery = encodeURIComponent(destination);
   const destinationUrl = `https://www.google.com/maps/search/?api=1&query=${destinationQuery}`;
-  messageParts.push(`- Destination: ${format.link(destination, destinationUrl)}`);
+  messageParts.push(`- Destination: ${format.url(destination, destinationUrl)}`);
 
   return { title, message: messageParts.join('\n') };
 }

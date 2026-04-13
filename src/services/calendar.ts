@@ -33,7 +33,7 @@ export async function createCalendarEvent(event: CalendarEvent, env: Env) {
       }
     );
 
-    const data = await response.json();
+    const data = await response.json() as Record<string, unknown>;
 
     if (!response.ok) {
       console.error('[Calendar] Failed to create calendar event:', data);
@@ -41,8 +41,8 @@ export async function createCalendarEvent(event: CalendarEvent, env: Env) {
     }
 
     console.log('[Calendar] Successfully created calendar event:', {
-      eventId: data.id,
-      htmlLink: data.htmlLink,
+      eventId: data['id'],
+      htmlLink: data['htmlLink'],
     });
 
     return data;
